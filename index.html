@@ -201,7 +201,6 @@
   #photoSheet .mbtn{width:100%;display:block;margin-top:10px;}
   #photoSheet .mbtn.del{background:#fff;color:#e0566e;border:1px solid #f1d4d9;}
   .pf-photo-count{font-size:11px;color:var(--sub);padding:4px 18px 0;}
-  .pf.edit .pf-thumb .tdel{display:flex;}
   .pf-sec{background:#fff;margin:12px 14px;border-radius:18px;padding:16px 16px;box-shadow:0 4px 14px rgba(0,0,0,.05);}
   .pf-sec .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
   .pf-sec .sec-h b{font-size:15px;font-weight:800;}
@@ -212,7 +211,7 @@
   .ints{display:flex;flex-wrap:wrap;gap:8px;}
   .int{font-size:12.5px;font-weight:600;color:var(--dark);background:#fce7ec;padding:8px 13px;border-radius:20px;position:relative;}
   .int .x{margin-left:6px;color:#c45f72;cursor:pointer;display:none;}
-  .pf.edit .int .x{display:inline;}
+  .ints.editing .int .x{display:inline;}
   .int.add{background:#fff;border:1.5px dashed var(--light);color:var(--main);cursor:pointer;}
   .info-row{display:flex;justify-content:space-between;font-size:13.5px;padding:9px 0;border-bottom:1px solid var(--line);}
   .info-row:last-child{border-bottom:none;}
@@ -237,6 +236,28 @@
   .pf-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
   .pf-logout{padding:2px 14px 28px;}
   .pf-logout button{width:100%;padding:13px;border-radius:14px;background:#fff;color:#9a929f;font-size:14px;font-weight:600;border:1px solid var(--line);cursor:pointer;}
+
+  /* ---------- SETTINGS ---------- */
+  #settings{position:absolute;inset:0;z-index:48;background:var(--bg);display:none;flex-direction:column;}
+  #settings.on{display:flex;}
+  .set-head{flex:0 0 auto;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;padding:34px 16px 14px;}
+  .set-head .bk{font-size:24px;cursor:pointer;line-height:1;color:var(--ink);}
+  .set-head b{font-size:17px;font-weight:800;}
+  .set-body{flex:1;overflow-y:auto;padding:10px 0 30px;}
+  .set-group{margin-bottom:14px;}
+  .set-glabel{font-size:12px;color:var(--sub);font-weight:700;padding:10px 18px 6px;}
+  .set-row{display:flex;align-items:center;justify-content:space-between;background:#fff;padding:14px 18px;font-size:14.5px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:-1px;}
+  .set-row.nav{cursor:pointer;}
+  .set-row .set-val{color:var(--sub);font-size:13.5px;}
+  .set-row .chev{color:#c8c2cd;font-size:18px;}
+  .set-toggle{width:44px;height:26px;border-radius:20px;background:#d9d4dd;position:relative;cursor:pointer;transition:background .2s;flex:0 0 auto;}
+  .set-toggle.on{background:var(--main);}
+  .set-toggle .knob{position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);}
+  .set-toggle.on .knob{left:21px;}
+  .set-foot{padding:12px 18px 0;}
+  .set-foot .lo{width:100%;padding:13px;border-radius:12px;background:#fff;border:1px solid var(--line);color:#6a626f;font-size:14px;font-weight:600;cursor:pointer;}
+  .set-withdraw{text-align:center;margin-top:16px;}
+  .set-withdraw span{font-size:12.5px;color:#b6b0bb;cursor:pointer;text-decoration:underline;}
 
   /* ---------- CHAT LIST ---------- */
   #chats{background:#fff;}
@@ -374,7 +395,7 @@
     <div class="statusbar"><span></span><span></span></div>
     <div class="apphead">
       <div class="logo">SOGON</div>
-      <div class="hi" id="headGear" style="display:none">⚙️</div>
+      <div class="hi" id="headGear" style="display:none" onclick="openSettings()">⚙️</div>
     </div>
 
     <!-- ============ DISCOVER ============ -->
@@ -433,6 +454,62 @@
           <div class="ai" onclick="sendAtt('file')"><div class="ac" style="background:#3fb98a">📎</div>파일</div>
           <div class="ai" onclick="sendAtt('voice')"><div class="ac" style="background:#E8B45C">🎙️</div>음성</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ============ SETTINGS ============ -->
+    <div id="settings">
+      <div class="set-head"><span class="bk" onclick="closeSettings()">‹</span><b>설정</b></div>
+      <div class="set-body">
+
+        <div class="set-group">
+          <div class="set-glabel">계정</div>
+          <div class="set-row"><span>이메일</span><span class="set-val">sprit6487@gmail.com</span></div>
+          <div class="set-row"><span>연결된 계정</span><span class="set-val">카카오</span></div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-glabel">알림</div>
+          <div class="set-row"><span>푸시 알림</span><div class="set-toggle on" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+          <div class="set-row"><span>새 메시지 알림</span><div class="set-toggle on" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+          <div class="set-row"><span>새 친구 신청 알림</span><div class="set-toggle on" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+          <div class="set-row"><span>마케팅·이벤트 알림</span><div class="set-toggle" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-glabel">개인정보 · 안전</div>
+          <div class="set-row"><span>읽음 표시</span><div class="set-toggle on" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+          <div class="set-row"><span>접속 상태 표시</span><div class="set-toggle on" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+          <div class="set-row nav" onclick="toast('차단 목록 화면은 준비 중이에요')"><span>차단 목록</span><span class="chev">›</span></div>
+          <div class="set-row nav" onclick="toast('신고 내역 화면은 준비 중이에요')"><span>내 신고 내역</span><span class="chev">›</span></div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-glabel">매칭 설정</div>
+          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>관심 성별</span><span class="set-val">여성 ›</span></div>
+          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>나이 범위</span><span class="set-val">30 – 45세 ›</span></div>
+          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>거리</span><span class="set-val">50km 이내 ›</span></div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-glabel">화면</div>
+          <div class="set-row"><span>다크 모드</span><div class="set-toggle" onclick="this.classList.toggle('on')"><span class="knob"></span></div></div>
+        </div>
+
+        <div class="set-group">
+          <div class="set-glabel">지원</div>
+          <div class="set-row nav" onclick="toast('공지사항은 준비 중이에요')"><span>공지사항</span><span class="chev">›</span></div>
+          <div class="set-row nav" onclick="toast('고객센터는 준비 중이에요')"><span>고객센터·문의</span><span class="chev">›</span></div>
+          <div class="set-row nav" onclick="toast('이용약관은 준비 중이에요')"><span>이용약관</span><span class="chev">›</span></div>
+          <div class="set-row nav" onclick="toast('개인정보처리방침은 준비 중이에요')"><span>개인정보처리방침</span><span class="chev">›</span></div>
+          <div class="set-row"><span>버전</span><span class="set-val">1.0.0</span></div>
+        </div>
+
+        <div class="set-foot">
+          <button class="lo" onclick="closeSettings();logout()">로그아웃</button>
+          <div class="set-withdraw"><span onclick="toast('회원 탈퇴는 고객센터를 통해 진행돼요')">회원 탈퇴</span></div>
+        </div>
+
       </div>
     </div>
 
@@ -861,7 +938,7 @@ let myProfile={
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English']
 };
-let pfEdit=false, aboutDraft='', birthDraft='', langDraft=[];
+let editSection=null, aboutDraft='', birthDraft='', langDraft=[];
 /* 생년월일 → 만 나이(국제 통용) */
 function calcAge(birth){
   if(!birth)return '-';
@@ -877,7 +954,7 @@ function renderProfile(){
   const md18=new Date();md18.setFullYear(md18.getFullYear()-18);
   const maxBirth=md18.toISOString().slice(0,10);
   document.getElementById('profile').innerHTML=`
-   <div class="pf ${pfEdit?'edit':''}">
+   <div class="pf">
     <div class="pf-hero">
       <div class="pfph" style="background:${m.photos[0]||'linear-gradient(160deg,#EC92A8,#DB6A85)'}"></div>
       <div class="pfsh"></div>
@@ -892,44 +969,48 @@ function renderProfile(){
     </div>
 
     <div class="pf-sec">
-      <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
-      <div class="ints">
+      <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleSection('interests')">${editSection==='interests'?'완료':'편집'}</span></div>
+      <div class="ints ${editSection==='interests'?'editing':''}">
         ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
-        ${pfEdit&&m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
+        ${editSection==='interests'&&m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
       </div>
     </div>
 
     <div class="pf-sec">
-      <div class="sec-h"><b>나에 대한 설명</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
-      ${pfEdit
+      <div class="sec-h"><b>나에 대한 설명</b><span class="ed" onclick="toggleSection('about')">${editSection==='about'?'완료':'편집'}</span></div>
+      ${editSection==='about'
         ? `<textarea id="aboutInput" placeholder="자기소개를 입력하세요" oninput="aboutDraft=this.value">${m.about}</textarea>`
         : `<p>${esc(m.about)}</p>`}
     </div>
 
     <div class="pf-sec">
-      <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
-      ${pfEdit
+      <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleSection('info')">${editSection==='info'?'완료':'편집'}</span></div>
+      ${editSection==='info'
         ? `<div class="info-row edit"><span>생년월일</span><input type="date" class="info-input date-input" id="birthInput" value="${birthDraft}" max="${maxBirth}" onchange="birthDraft=this.value;updateAgePreview()"></div>
            <div class="info-row"><span>나이</span><b id="agePreview">${calcAge(birthDraft)}세</b></div>`
         : `<div class="info-row"><span>나이</span><b>${calcAge(m.birth)}세</b></div>`}
-      <div class="info-row"><span>성별</span><b>${m.gender}${pfEdit?'<em class="locked">변경 불가</em>':''}</b></div>
-      ${pfEdit
+      <div class="info-row"><span>성별</span><b>${m.gender}${editSection==='info'?'<em class="locked">변경 불가</em>':''}</b></div>
+      ${editSection==='info'
         ? `<div class="info-row edit lang-row" onclick="openLangPicker()"><span>언어</span><b class="lang-field">${langDraft.length?langDraft.join(', '):'선택'} <span class="caret">▾</span></b></div>`
         : `<div class="info-row"><span>언어</span><b>${m.languages.join(', ')}</b></div>`}
     </div>
 
-    ${pfEdit?`<div class="pf-save"><button onclick="saveProfile()">저장하기</button></div>`:''}
     <div class="pf-logout"><button onclick="logout()">로그아웃</button></div>
    </div>`;
 }
-function toggleEdit(){
-  if(pfEdit){saveProfile();return;}
-  pfEdit=true;aboutDraft=myProfile.about;birthDraft=myProfile.birth;langDraft=[...myProfile.languages];renderProfile();
+function toggleSection(sec){
+  if(editSection===sec){saveSection(sec);editSection=null;renderProfile();return;}
+  if(editSection)saveSection(editSection);
+  editSection=sec;
+  if(sec==='about')aboutDraft=myProfile.about;
+  if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];}
+  renderProfile();
 }
-function saveProfile(){
-  if(aboutDraft)myProfile.about=aboutDraft;
-  myProfile.birth=birthDraft;myProfile.languages=[...langDraft];
-  pfEdit=false;saveProfileLS();renderProfile();toast('✅ 프로필을 저장했어요');
+function saveSection(sec){
+  if(sec==='about'){if(aboutDraft)myProfile.about=aboutDraft;}
+  if(sec==='info'){myProfile.birth=birthDraft;myProfile.languages=[...langDraft];}
+  saveProfileLS();
+  if(sec!=='interests')toast('✅ 저장했어요');
 }
 function updateAgePreview(){const el=document.getElementById('agePreview');if(el)el.textContent=calcAge(birthDraft)+'세';}
 /* 언어 멀티 선택 (최대 3개) */
@@ -1047,6 +1128,10 @@ let splashDone=false;
 function hideSplash(){if(splashDone)return;splashDone=true;splash.classList.add('hide');}
 splash.addEventListener('click',hideSplash);
 setTimeout(hideSplash,2600);
+
+/* settings */
+function openSettings(){document.getElementById('settings').classList.add('on');}
+function closeSettings(){document.getElementById('settings').classList.remove('on');}
 
 /* login / logout */
 function doLogin(provider){
