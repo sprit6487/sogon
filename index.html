@@ -863,7 +863,6 @@ function renderProfile(){
           ${i===0?'<span class="main-badge">대표</span>':''}</div>`).join('')}
       ${m.photos.length<10?`<div class="pf-thumb add" onclick="addPhoto()">＋</div>`:''}
     </div>
-    <div class="pf-photo-count">${m.photos.length}/10장${m.photos.length?' · 사진을 탭하면 대표 설정·삭제할 수 있어요':''}</div>
 
     <div class="pf-sec">
       <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
