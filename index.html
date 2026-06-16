@@ -50,6 +50,38 @@
   @keyframes lmUp{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
   @keyframes lmBlink{0%,100%{opacity:.3;transform:translateY(0);}50%{opacity:1;transform:translateY(-4px);}}
 
+  /* ---------- LOGIN ---------- */
+  .login{position:absolute;inset:0;z-index:90;padding:0 30px;
+    background:linear-gradient(165deg,#EC92A8 0%,#DB6A85 50%,#B84E68 100%);
+    display:flex;flex-direction:column;align-items:center;
+    transition:opacity .5s ease, visibility .5s;overflow:hidden;}
+  .login.hide{opacity:0;visibility:hidden;}
+  .login::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.07);top:-110px;right:-120px;}
+  .login .lg-logo{margin-top:104px;width:80px;height:80px;border-radius:26px 26px 26px 8px;}
+  .login .lg-logo .murmur{gap:5px;}
+  .login .lg-logo .murmur i:nth-child(1){width:7px;height:7px;}
+  .login .lg-logo .murmur i:nth-child(2){width:9px;height:9px;}
+  .login .lg-logo .murmur i:nth-child(3){width:11px;height:11px;}
+  .login-name{color:#fff;font-size:30px;font-weight:800;letter-spacing:.24em;text-indent:.24em;margin-top:20px;z-index:1;}
+  .login-tag{color:rgba(255,255,255,.92);font-size:13px;margin-top:11px;text-align:center;z-index:1;}
+  .login-btns{margin-top:auto;width:100%;padding-bottom:32px;z-index:1;}
+  .login-lead{color:rgba(255,255,255,.92);font-size:12.5px;text-align:center;margin-bottom:15px;}
+  .sbtn{width:100%;height:53px;border-radius:14px;border:none;display:flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;cursor:pointer;margin-bottom:11px;position:relative;
+    box-shadow:0 5px 14px rgba(0,0,0,.14);transition:transform .1s;}
+  .sbtn:active{transform:scale(.98);}
+  .sbtn .sic{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+  .sbtn.google{background:#fff;color:#1f1f1f;}
+  .sbtn.line{background:#06C755;color:#fff;}
+  .sbtn.kakao{background:#FEE500;color:#191600;}
+  .ic-google{font-family:Arial,sans-serif;font-weight:800;font-size:19px;color:#4285F4;}
+  .ic-kakao{width:20px;height:18px;background:#191600;border-radius:50%/56%;}
+  .ic-kakao::after{content:'';position:absolute;bottom:-2px;left:4px;width:0;height:0;border:4px solid transparent;border-top-color:#191600;border-bottom:0;transform:rotate(18deg);}
+  .ic-line{width:20px;height:18px;background:#fff;border-radius:7px;}
+  .ic-line::after{content:'';position:absolute;bottom:-2px;left:4px;width:0;height:0;border:4px solid transparent;border-top-color:#fff;border-bottom:0;}
+  .login-terms{color:rgba(255,255,255,.8);font-size:10.5px;text-align:center;margin-top:8px;line-height:1.55;}
+  .login-terms u{cursor:pointer;}
+
   .statusbar{flex:0 0 auto;display:flex;justify-content:space-between;padding:12px 26px 6px;font-size:12px;font-weight:700;color:#fff;background:var(--main);z-index:2;}
   .apphead{flex:0 0 auto;background:var(--main);color:#fff;padding:2px 18px 14px;display:flex;align-items:center;justify-content:space-between;}
   .apphead .logo{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
@@ -181,6 +213,8 @@
   .info-input:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--main);}
   .pf-save{margin:4px 14px 22px;}
   .pf-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
+  .pf-logout{padding:2px 14px 28px;}
+  .pf-logout button{width:100%;padding:13px;border-radius:14px;background:#fff;color:#9a929f;font-size:14px;font-weight:600;border:1px solid var(--line);cursor:pointer;}
 
   /* ---------- CHAT LIST ---------- */
   #chats{background:#fff;}
@@ -293,6 +327,21 @@
       <div class="splash-kr">소곤</div>
       <div class="splash-tag">소곤소곤, 국경을 넘어 마음을 잇다</div>
       <div class="splash-dots"><i></i><i></i><i></i></div>
+    </div>
+
+    <!-- ============ LOGIN ============ -->
+    <div class="login" id="login">
+      <div class="logo-mark lg-logo"><span class="murmur"><i></i><i></i><i></i></span></div>
+      <div class="login-name">SOGON</div>
+      <div class="login-tag">소곤소곤, 국경을 넘어 마음을 잇다</div>
+
+      <div class="login-btns">
+        <p class="login-lead">간편하게 시작하기</p>
+        <button class="sbtn google" onclick="doLogin('Google')"><span class="sic ic-google">G</span>Google로 시작하기</button>
+        <button class="sbtn line" onclick="doLogin('라인')"><span class="sic ic-line"></span>라인으로 시작하기</button>
+        <button class="sbtn kakao" onclick="doLogin('카카오')"><span class="sic ic-kakao"></span>카카오로 시작하기</button>
+        <p class="login-terms">로그인하면 <u>이용약관</u> 및 <u>개인정보처리방침</u>에<br>동의하는 것으로 간주됩니다.</p>
+      </div>
     </div>
 
     <div class="statusbar"><span></span><span></span></div>
@@ -815,6 +864,7 @@ function renderProfile(){
     </div>
 
     ${pfEdit?`<div class="pf-save"><button onclick="saveProfile()">저장하기</button></div>`:''}
+    <div class="pf-logout"><button onclick="logout()">로그아웃</button></div>
    </div>`;
 }
 function toggleEdit(){
@@ -844,6 +894,16 @@ let splashDone=false;
 function hideSplash(){if(splashDone)return;splashDone=true;splash.classList.add('hide');}
 splash.addEventListener('click',hideSplash);
 setTimeout(hideSplash,2600);
+
+/* login / logout */
+function doLogin(provider){
+  document.getElementById('login').classList.add('hide');
+  go('discover');
+  toast(provider+' 계정으로 로그인했어요');
+}
+function logout(){
+  document.getElementById('login').classList.remove('hide');
+}
 
 /* init */
 renderDeck();renderGrid();renderChats();renderProfile();
