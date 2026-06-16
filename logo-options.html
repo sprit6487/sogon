@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소곤 로고 후보 · 귓속말 컨셉</title>
+<style>
+  :root{--main:#DB6A85;--light:#EC92A8;--dark:#B84E68;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo',sans-serif;
+    background:#15131a;color:#e8e8ea;padding:44px 22px 70px;}
+  .wrap{max-width:1080px;margin:0 auto;}
+  header{text-align:center;margin-bottom:10px;}
+  header h1{font-size:27px;font-weight:800;letter-spacing:-0.02em;}
+  header p{color:#9a9aa2;font-size:14px;margin-top:8px;}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:34px;}
+  @media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:520px){.grid{grid-template-columns:1fr;}}
+  .card{background:#1b1922;border:1px solid #2a2731;border-radius:20px;padding:22px 16px 18px;text-align:center;}
+  .tile{width:104px;height:104px;border-radius:28px;margin:0 auto 16px;
+    background:linear-gradient(155deg,#EC92A8,#DB6A85 55%,#B84E68);
+    display:flex;align-items:center;justify-content:center;position:relative;
+    box-shadow:0 12px 26px rgba(184,78,104,.35);overflow:visible;}
+  .num{font-size:11px;color:#7e7a86;letter-spacing:.1em;}
+  .nm{font-size:15.5px;font-weight:800;margin-top:5px;}
+  .en{font-size:11px;color:#8f8a97;letter-spacing:.12em;text-transform:uppercase;margin-top:2px;}
+  .desc{font-size:11.5px;color:#a7a2af;line-height:1.55;margin-top:9px;min-height:48px;}
+  .foot{margin-top:34px;text-align:center;color:#8f8a97;font-size:13px;line-height:1.7;
+    border:1px solid #2a2731;border-radius:14px;padding:16px 20px;background:#1b1922;}
+  .foot b{color:var(--light);}
+
+  /* ============ MARKS ============ */
+
+  /* 1. 소리물결 — dot + concentric arcs */
+  .lk1{position:relative;width:62px;height:54px;margin-left:-6px;}
+  .lk1 .dot{position:absolute;left:6px;top:50%;transform:translateY(-50%);width:12px;height:12px;background:#fff;border-radius:50%;}
+  .lk1 .arc{position:absolute;top:50%;border:3px solid transparent;border-right-color:#fff;border-radius:50%;transform:translateY(-50%);}
+  .lk1 .a1{width:22px;height:22px;left:1px;}
+  .lk1 .a2{width:36px;height:36px;left:-6px;opacity:.6;}
+  .lk1 .a3{width:50px;height:50px;left:-13px;opacity:.35;}
+
+  /* 2. 속삭임 말풍선 — bubble + ascending dots */
+  .lk2{width:76px;height:62px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .lk2 i{border-radius:50%;background:var(--main);}
+  .lk2 i:nth-child(1){width:8px;height:8px;opacity:.45;}
+  .lk2 i:nth-child(2){width:10px;height:10px;opacity:.72;}
+  .lk2 i:nth-child(3){width:12px;height:12px;}
+
+  /* 3. 맞댄 말풍선 — two leaning bubbles */
+  .lk3{position:relative;width:74px;height:60px;}
+  .lk3 b{position:absolute;background:#fff;}
+  .lk3 .b1{width:42px;height:34px;left:0;top:2px;border-radius:16px 16px 6px 16px;}
+  .lk3 .b2{width:34px;height:27px;right:0;top:24px;border-radius:15px 15px 15px 5px;background:rgba(255,255,255,.82);}
+
+  /* 4. 두 사람 — heads leaning + whisper dots */
+  .lk4{position:relative;width:80px;height:56px;}
+  .lk4 .person{position:absolute;bottom:0;width:34px;}
+  .lk4 .head{width:20px;height:20px;border-radius:50%;background:#fff;margin:0 auto 3px;}
+  .lk4 .torso{width:32px;height:24px;border-radius:16px 16px 4px 4px;background:#fff;}
+  .lk4 .pA{left:2px;}
+  .lk4 .pB{right:2px;transform:rotate(-13deg);transform-origin:bottom center;opacity:.92;}
+  .lk4 .wd{position:absolute;top:4px;left:50%;transform:translateX(-50%);display:flex;gap:3px;}
+  .lk4 .wd i{width:4px;height:4px;border-radius:50%;background:#fff;}
+  .lk4 .wd i:nth-child(1){opacity:.5;}
+  .lk4 .wd i:nth-child(2){opacity:.75;}
+
+  /* 5. 귀와 소리 — ear + waves entering */
+  .lk5{position:relative;width:64px;height:54px;}
+  .lk5 .ear{width:34px;height:44px;border:8px solid #fff;border-radius:60% 60% 55% 55%/52% 52% 48% 48%;border-right-color:transparent;position:absolute;right:4px;top:4px;transform:rotate(10deg);}
+  .lk5 .ear::before{content:'';position:absolute;width:9px;height:15px;border:5px solid #fff;border-radius:50%;border-right-color:transparent;left:4px;top:8px;}
+  .lk5 .arc{position:absolute;top:50%;border:3px solid transparent;border-left-color:#fff;border-radius:50%;transform:translateY(-50%);}
+  .lk5 .arc1{width:14px;height:14px;left:10px;opacity:.95;}
+  .lk5 .arc2{width:24px;height:24px;left:3px;opacity:.5;}
+
+  /* 6. 귀 스파이럴 — concentric spiral (listening) */
+  .lk6{position:relative;width:54px;height:54px;}
+  .lk6 b{position:absolute;border:4px solid transparent;border-radius:50%;}
+  .lk6 .r1{inset:0;border-top-color:#fff;border-right-color:#fff;}
+  .lk6 .r2{inset:9px;border-bottom-color:#fff;border-left-color:#fff;}
+  .lk6 .r3{inset:18px;border-top-color:#fff;border-right-color:#fff;}
+  .lk6 .core{width:7px;height:7px;border-radius:50%;background:#fff;border:none;left:50%;top:50%;transform:translate(-50%,-50%);}
+
+  /* 7. 사그라드는 속삭임 — fading murmur dots */
+  .lk7{display:flex;align-items:center;gap:8px;}
+  .lk7 i{border-radius:50%;background:#fff;}
+  .lk7 i:nth-child(1){width:15px;height:15px;}
+  .lk7 i:nth-child(2){width:12px;height:12px;opacity:.78;}
+  .lk7 i:nth-child(3){width:9px;height:9px;opacity:.55;}
+  .lk7 i:nth-child(4){width:6px;height:6px;opacity:.32;}
+
+  /* 8. S 모노그램 — initial + waves */
+  .lk8{display:flex;align-items:center;gap:7px;}
+  .lk8 .s{font-family:Georgia,'Times New Roman',serif;font-size:56px;font-weight:700;color:#fff;line-height:.9;}
+  .lk8 .sw{display:flex;flex-direction:column;gap:6px;}
+  .lk8 .sw b{border:2.5px solid transparent;border-right-color:#fff;border-radius:50%;}
+  .lk8 .sw b:nth-child(1){width:12px;height:12px;}
+  .lk8 .sw b:nth-child(2){width:18px;height:18px;opacity:.55;margin-left:-3px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>소곤 로고 후보 · 귓속말 컨셉</h1>
+    <p>리터럴(귀) · 추상(소리) · 관계형(두 사람) · 대화(말풍선) · 타이포 방향의 8가지 안</p>
+  </header>
+
+  <div class="grid">
+
+    <div class="card">
+      <div class="tile"><div class="lk1"><span class="dot"></span><span class="arc a1"></span><span class="arc a2"></span><span class="arc a3"></span></div></div>
+      <div class="num">01</div><div class="nm">소리물결</div><div class="en">Whisper Waves</div>
+      <div class="desc">한 점에서 번지는 작은 소리. 가장 미니멀하고 확장성 좋은 추상형.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk2"><i></i><i></i><i></i></div></div>
+      <div class="num">02</div><div class="nm">속삭임 말풍선</div><div class="en">Murmur Bubble</div>
+      <div class="desc">말풍선 안에서 점점 커지는 소곤거림. 대화 앱 정체성이 분명.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk3"><b class="b1"></b><b class="b2"></b></div></div>
+      <div class="num">03</div><div class="nm">맞댄 말풍선</div><div class="en">Close Bubbles</div>
+      <div class="desc">가까이 기대 속삭이는 두 개의 말풍선. 친밀한 1:1 대화.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk4">
+        <div class="wd"><i></i><i></i><i></i></div>
+        <div class="person pA"><div class="head"></div><div class="torso"></div></div>
+        <div class="person pB"><div class="head"></div><div class="torso"></div></div>
+      </div></div>
+      <div class="num">04</div><div class="nm">두 사람</div><div class="en">Two People</div>
+      <div class="desc">서로 기대 귓속말하는 두 사람. 가장 직관적인 '귓속말 장면'.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk5">
+        <span class="arc arc2"></span><span class="arc arc1"></span><span class="ear"></span>
+      </div></div>
+      <div class="num">05</div><div class="nm">귀와 소리</div><div class="en">Ear &amp; Waves</div>
+      <div class="desc">귀로 전해지는 소리. '귓속말'을 가장 문자 그대로 표현.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk6"><b class="r1"></b><b class="r2"></b><b class="r3"></b><b class="core"></b></div></div>
+      <div class="num">06</div><div class="nm">귀 스파이럴</div><div class="en">Spiral / Listen</div>
+      <div class="desc">귓속 달팽이관·경청을 형상화한 나선. 차분하고 성숙한 인상.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk7"><i></i><i></i><i></i><i></i></div></div>
+      <div class="num">07</div><div class="nm">사그라드는 속삭임</div><div class="en">Fading Murmur</div>
+      <div class="desc">크기가 잦아드는 점들. 점점 작아지는 속삭임의 잔향.</div>
+    </div>
+
+    <div class="card">
+      <div class="tile"><div class="lk8"><span class="s">S</span><span class="sw"><b></b><b></b></span></div></div>
+      <div class="num">08</div><div class="nm">S 모노그램</div><div class="en">S Monogram</div>
+      <div class="desc">이니셜 S에 소리물결을 더한 타이포형. 워드마크와 잘 맞음.</div>
+    </div>
+
+  </div>
+
+  <div class="foot">
+    마음에 드는 번호를 알려주세요. 고른 안을 <b>다듬어서 스플래시 화면 로고로 교체</b>해 드릴게요.<br>
+    "5번인데 소리물결을 더 크게" 처럼 변형 요청도 가능하고, 두 안을 합치는 것도 됩니다.
+  </div>
+</div>
+</body>
+</html>

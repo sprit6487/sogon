@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미프 리뉴얼 — 컬러별 앱 화면 예시</title>
+<style>
+  :root {
+    --teal: #1E6F6E; --teal-l: #2A8C82; --teal-acc: #F2A65A;
+    --wine: #7B2D3B; --wine-l: #9B3B4E; --wine-acc: #D9A441;
+    --terra: #C26B4A; --terra-l: #D98E6A; --terra-acc: #3E7C74;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
+    background: #0f1115; color: #e8e8ea; padding: 44px 24px 70px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 8px; }
+  header h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  header p { color: #9a9aa2; margin-top: 8px; font-size: 14.5px; }
+  .target {
+    text-align: center; color: #777; font-size: 12.5px; margin: 14px auto 44px;
+    max-width: 660px; border: 1px solid #23262e; border-radius: 12px; padding: 11px 18px;
+  }
+  .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; justify-items: center; }
+  @media (max-width: 980px){ .cols { grid-template-columns: 1fr; } }
+
+  .col-label { text-align: center; margin-bottom: 14px; }
+  .col-label .rk { font-size: 12px; letter-spacing: 0.08em; color: #8a8a92; text-transform: uppercase; }
+  .col-label .nm { font-size: 17px; font-weight: 800; margin-top: 3px; }
+  .col-label .hx { font-size: 12px; color: #6a6a72; margin-top: 2px; }
+
+  /* phone frame */
+  .phone {
+    width: 320px; border-radius: 38px; background: #000; padding: 10px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.55);
+  }
+  .screen { border-radius: 30px; overflow: hidden; background: #fff; position: relative; }
+  .notch { position:absolute; top:0; left:50%; transform:translateX(-50%); width:120px; height:24px; background:#000; border-radius:0 0 16px 16px; z-index:5; }
+
+  /* status + nav */
+  .statusbar { display:flex; justify-content:space-between; padding:11px 22px 0; font-size:12px; font-weight:700; color:#fff; }
+  .topbar { padding: 14px 18px 16px; color:#fff; }
+  .topbar .row { display:flex; justify-content:space-between; align-items:center; }
+  .topbar .title { font-size:19px; font-weight:800; letter-spacing:-0.01em; }
+  .topbar .ico { font-size:17px; opacity:.92; }
+  .tabs { display:flex; gap:18px; margin-top:14px; font-size:13.5px; font-weight:600; color:rgba(255,255,255,.6); }
+  .tabs .on { color:#fff; position:relative; }
+  .tabs .on::after { content:''; position:absolute; left:0; right:0; bottom:-7px; height:3px; border-radius:3px; background:#fff; }
+
+  /* body */
+  .body { background:#f6f7f9; padding: 16px 14px 0; }
+  .hint { font-size:12px; color:#8a8a92; margin: 2px 4px 12px; }
+
+  /* featured card */
+  .feature { border-radius:20px; overflow:hidden; position:relative; height:330px; box-shadow:0 8px 24px rgba(0,0,0,.10); }
+  .feature .photo { position:absolute; inset:0; }
+  .feature .grad { position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.72) 0%, rgba(0,0,0,0) 55%); }
+  .feature .badge { position:absolute; top:14px; left:14px; font-size:11px; font-weight:700; color:#fff; padding:6px 11px; border-radius:20px; backdrop-filter:blur(6px); }
+  .feature .info { position:absolute; left:16px; right:16px; bottom:16px; color:#fff; }
+  .feature .nm { font-size:22px; font-weight:800; }
+  .feature .nm span { font-weight:600; font-size:18px; opacity:.92; }
+  .feature .meta { font-size:13px; opacity:.92; margin-top:3px; }
+  .feature .tags { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .feature .tag { font-size:11px; font-weight:600; color:#fff; background:rgba(255,255,255,.22); padding:5px 9px; border-radius:20px; backdrop-filter:blur(4px); }
+
+  .actions { display:flex; gap:10px; margin-top:14px; }
+  .actions .btn { flex:1; text-align:center; padding:14px; border-radius:14px; font-size:14.5px; font-weight:700; }
+  .btn-main { color:#fff; }
+  .btn-acc { }
+
+  /* mini list */
+  .seclabel { font-size:13px; font-weight:800; color:#23262e; margin:20px 4px 10px; }
+  .mini { display:flex; gap:11px; overflow:hidden; padding-bottom:14px; }
+  .mcard { width:108px; flex:0 0 auto; }
+  .mcard .mph { height:124px; border-radius:14px; position:relative; overflow:hidden; }
+  .mcard .mph .dot { position:absolute; top:8px; right:8px; width:9px; height:9px; border-radius:50%; border:2px solid #fff; }
+  .mcard .mn { font-size:12.5px; font-weight:700; color:#23262e; margin-top:7px; }
+  .mcard .ms { font-size:11px; color:#8a8a92; }
+
+  /* bottom nav */
+  .botnav { display:flex; justify-content:space-around; padding:12px 0 16px; background:#fff; border-top:1px solid #eee; }
+  .botnav .it { font-size:11px; color:#b0b0b8; text-align:center; font-weight:600; }
+  .botnav .it.on { }
+  .botnav .it .g { font-size:18px; display:block; margin-bottom:2px; }
+
+  .reco {
+    margin: 46px auto 0; max-width: 820px; background:#131a1a; border:1px solid #1f3b39;
+    border-radius:16px; padding:22px 24px; font-size:14.5px; color:#c9d6d4; text-align:center;
+  }
+  .reco b { color:#4fd1c5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>미프 리뉴얼 · 컬러별 앱 화면 예시</h1>
+    <p>실제 "오늘의 인연" 탐색 화면을 1·2·3순위 컬러로 적용한 모습</p>
+  </header>
+  <div class="target">
+    타깃 · 한국인 30대 후반~40대 후반 &nbsp;×&nbsp; 외국인 30대 초~40대 초 &nbsp;|&nbsp; 키워드: 진지한 관계 · 안정 · 크로스컬처
+  </div>
+
+  <div class="cols" id="cols"></div>
+
+  <div class="reco">
+    <b>제 추천 →</b> 1순위 <b>딥 틸</b>을 메인으로. 신뢰·성숙을 잡아주면서 따뜻한 코랄 액센트로 연애 앱의 온기를 유지합니다.
+  </div>
+</div>
+
+<script>
+const themes = [
+  {
+    rk:'1순위', nm:'클리어 로제 와인 (Clear Rosé)', hx:'#DB6A85',
+    main:'#DB6A85', light:'#EC92A8', acc:'#E8B45C', accText:'#3a2a08',
+    p1:'linear-gradient(135deg,#EC92A8,#DB6A85)', p2:'#EC92A8', p3:'#e27d96', p4:'#f2a8ba'
+  },
+  {
+    rk:'2순위', nm:'더스티 로즈 (Dusty Rose)', hx:'#B06576',
+    main:'#B06576', light:'#C98593', acc:'#E0B25C', accText:'#3a2a08',
+    p1:'linear-gradient(135deg,#C98593,#B06576)', p2:'#C98593', p3:'#bd7383', p4:'#d398a4'
+  },
+  {
+    rk:'3순위', nm:'테라코타 (Terracotta)', hx:'#C26B4A',
+    main:'#C26B4A', light:'#D98E6A', acc:'#3E7C74', accText:'#ffffff',
+    p1:'linear-gradient(135deg,#D98E6A,#C26B4A)', p2:'#D98E6A', p3:'#cf7e5b', p4:'#e0a081'
+  }
+];
+
+const people = [
+  {n:'Emma', a:34, f:'🇩🇪', s:'한국어 3년차'},
+  {n:'Sofia', a:36, f:'🇪🇸', s:'한식 요리'},
+  {n:'Lena', a:33, f:'🇫🇷', s:'서울 거주'}
+];
+
+function card(t){
+  return `
+  <div>
+    <div class="col-label">
+      <div class="rk">${t.rk}</div>
+      <div class="nm">${t.nm}</div>
+      <div class="hx">${t.hx}</div>
+    </div>
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <div style="background:${t.p1}">
+          <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+          <div class="topbar">
+            <div class="row">
+              <div class="title">미프</div>
+              <div class="ico">🔔 &nbsp; ⚙️</div>
+            </div>
+            <div class="tabs">
+              <span class="on">오늘의 인연</span><span>대화</span><span>관심</span><span>내 프로필</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="body">
+          <div class="hint">📍 서울 · 오늘 새로 매칭된 5명</div>
+
+          <div class="feature">
+            <div class="photo" style="background:linear-gradient(160deg,${t.light},${t.main})"></div>
+            <div class="grad"></div>
+            <div class="badge" style="background:${t.main}cc">✨ 추천 인연</div>
+            <div class="info">
+              <div class="nm">Daniel <span>· 38</span></div>
+              <div class="meta">🇺🇸 미국 · K-드라마 애호가 · 한국 거주 2년</div>
+              <div class="tags">
+                <span class="tag">진지한 만남</span>
+                <span class="tag">영화</span>
+                <span class="tag">한국어 공부</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <div class="btn btn-main" style="background:${t.main}">💬 대화 시작</div>
+            <div class="btn btn-acc" style="background:${t.acc};color:${t.accText}">♥ 관심 보내기</div>
+          </div>
+
+          <div class="seclabel">근처의 새로운 인연</div>
+          <div class="mini">
+            ${people.map((p,i)=>`
+              <div class="mcard">
+                <div class="mph" style="background:linear-gradient(160deg,${[t.p2,t.p3,t.p4][i]},${t.main})">
+                  <span class="dot" style="background:${t.acc}"></span>
+                </div>
+                <div class="mn">${p.n} · ${p.a}</div>
+                <div class="ms">${p.f} ${p.s}</div>
+              </div>`).join('')}
+          </div>
+
+          <div class="botnav">
+            <div class="it on" style="color:${t.main}"><span class="g">🏠</span>홈</div>
+            <div class="it"><span class="g">🔍</span>탐색</div>
+            <div class="it"><span class="g">💬</span>대화</div>
+            <div class="it"><span class="g">👤</span>프로필</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+document.getElementById('cols').innerHTML = themes.map(card).join('');
+</script>
+</body>
+</html>
