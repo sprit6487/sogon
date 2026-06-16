@@ -192,6 +192,8 @@
   .pf-thumb{width:74px;height:96px;border-radius:12px;flex:0 0 auto;position:relative;box-shadow:0 3px 9px rgba(0,0,0,.1);}
   .pf-thumb .tdel{position:absolute;top:-5px;right:-5px;width:20px;height:20px;border-radius:50%;background:#e0566e;color:#fff;font-size:12px;display:none;align-items:center;justify-content:center;cursor:pointer;}
   .pf-thumb.add{display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--main);background:#fff;border:2px dashed var(--light);cursor:pointer;}
+  .pf-thumb .main-badge{position:absolute;left:4px;bottom:4px;background:var(--main);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .pf-photo-count{font-size:11px;color:var(--sub);padding:4px 18px 0;}
   .pf.edit .pf-thumb .tdel{display:flex;}
   .pf-sec{background:#fff;margin:12px 14px;border-radius:18px;padding:16px 16px;box-shadow:0 4px 14px rgba(0,0,0,.05);}
   .pf-sec .sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
@@ -418,6 +420,7 @@
     <div class="modal" id="modal"><div class="msheet" id="msheet"></div></div>
     <!-- report modal -->
     <div class="modal" id="reportModal"><div class="msheet" id="reportSheet"></div></div>
+    <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
     <div class="toast" id="toast"></div>
 
     <!-- bottom nav -->
@@ -843,9 +846,11 @@ function renderProfile(){
 
     <div class="pf-gallery">
       ${m.photos.map((p,i)=>`<div class="pf-thumb" style="background:${p}">
-          ${i>0?`<span class="tdel" onclick="delPhoto(${i})">✕</span>`:''}</div>`).join('')}
-      <div class="pf-thumb add" onclick="addPhoto()">＋</div>
+          <span class="tdel" onclick="delPhoto(${i})">✕</span>
+          ${i===0?'<span class="main-badge">대표</span>':''}</div>`).join('')}
+      ${m.photos.length<10?`<div class="pf-thumb add" onclick="addPhoto()">＋</div>`:''}
     </div>
+    <div class="pf-photo-count">${m.photos.length}/10장 · 첫 번째 사진이 대표 사진이에요</div>
 
     <div class="pf-sec">
       <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
@@ -888,11 +893,26 @@ function addInterest(){
 }
 function delInterest(i){myProfile.interests.splice(i,1);renderProfile();}
 function addPhoto(){
-  const pool=[grad('#f5b27a','#d98e6a'),grad('#c9a6e0','#8A6B91'),grad('#7ed3c4','#3E7C74'),grad('#f0a6b8','#c45f72')];
-  myProfile.photos.push(pool[myProfile.photos.length%pool.length]);
-  renderProfile();toast('🖼️ 사진을 추가했어요 (데모)');
+  if(myProfile.photos.length>=10){toast('사진은 최대 10장까지 등록할 수 있어요');return;}
+  document.getElementById('photoInput').click();
 }
-function delPhoto(i){myProfile.photos.splice(i,1);renderProfile();}
+function delPhoto(i){
+  if(myProfile.photos.length<=1){toast('최소 1장의 사진이 필요해요');return;}
+  myProfile.photos.splice(i,1);renderProfile();
+}
+document.getElementById('photoInput').addEventListener('change',function(e){
+  const slots=10-myProfile.photos.length;
+  if(slots<=0){toast('사진은 최대 10장까지 등록할 수 있어요');this.value='';return;}
+  const files=[...e.target.files].filter(f=>f.type.startsWith('image/')).slice(0,slots);
+  const over=e.target.files.length>files.length;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{myProfile.photos.push(`url('${ev.target.result}') center/cover no-repeat`);renderProfile();};
+    reader.readAsDataURL(file);
+  });
+  if(files.length)toast(over?'최대 10장까지만 등록돼요':files.length+'장을 추가했어요');
+  this.value='';
+});
 
 /* splash */
 const splash=document.getElementById('splash');
