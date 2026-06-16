@@ -357,7 +357,7 @@
     <div class="statusbar"><span></span><span></span></div>
     <div class="apphead">
       <div class="logo">SOGON</div>
-      <div class="hi">⚙️</div>
+      <div class="hi" id="headGear" style="display:none">⚙️</div>
     </div>
 
     <!-- ============ DISCOVER ============ -->
@@ -491,6 +491,7 @@ function go(v){
   document.getElementById(v).classList.add('on');
   document.querySelectorAll('.bnav .bi').forEach(e=>e.classList.remove('on'));
   const nav=document.getElementById('nav-'+v); if(nav)nav.classList.add('on');
+  document.getElementById('headGear').style.display=(v==='profile')?'block':'none';
   closeRoom();
 }
 
