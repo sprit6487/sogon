@@ -221,6 +221,9 @@
   .info-row.edit{align-items:center;padding:7px 0;}
   .info-input{border:none;outline:none;text-align:right;font-size:13.5px;font-weight:600;color:var(--ink);background:#f4f1f4;border-radius:9px;padding:7px 11px;max-width:62%;font-family:inherit;}
   .info-input:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--main);}
+  .info-row .locked{font-size:11px;color:#b6b0bb;font-style:normal;font-weight:500;margin-left:7px;}
+  .interest-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14.5px;font-family:inherit;outline:none;margin-bottom:14px;}
+  .interest-input:focus{border-color:var(--main);}
   .pf-save{margin:4px 14px 22px;}
   .pf-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
   .pf-logout{padding:2px 14px 28px;}
@@ -243,7 +246,7 @@
   /* ---------- CHAT ROOM ---------- */
   #room{background:#efe9ec;position:absolute;inset:0;z-index:40;display:none;flex-direction:column;}
   #room.on{display:flex;}
-  .rhead{flex:0 0 auto;background:var(--main);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 14px;}
+  .rhead{flex:0 0 auto;background:var(--main);color:#fff;display:flex;align-items:center;gap:10px;padding:34px 14px 12px;}
   .rhead .bk{font-size:22px;cursor:pointer;line-height:1;}
   .rhead .rav{width:38px;height:38px;border-radius:50%;}
   .rhead .rinfo{flex:1;min-width:0;}
@@ -430,6 +433,8 @@
     <div class="modal" id="reportModal"><div class="msheet" id="reportSheet"></div></div>
     <!-- photo action modal -->
     <div class="modal" id="photoModal"><div class="msheet" id="photoSheet"></div></div>
+    <!-- interest input modal -->
+    <div class="modal" id="interestModal"><div class="msheet" id="interestSheet"></div></div>
     <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
     <div class="toast" id="toast"></div>
 
@@ -843,7 +848,7 @@ let myProfile={
   photos:[],
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
-  info:{지역:'서울 · 마포구', 직업:'마케터', 언어:'한국어, English', 키:'178cm'}
+  info:{나이:'42세', 성별:'남성', 언어:'한국어, English'}
 };
 let pfEdit=false, aboutDraft='', infoDraft={};
 
@@ -855,7 +860,7 @@ function renderProfile(){
       <div class="pfph" style="background:${m.photos[0]||'linear-gradient(160deg,#EC92A8,#DB6A85)'}"></div>
       <div class="pfsh"></div>
       ${m.photos.length?'':'<div class="pf-empty-cta" onclick="addPhoto()"><span class="plus">＋</span><span class="t">대표 사진을 등록해주세요</span></div>'}
-      <div class="pfnm"><b>${m.name} <small>· ${m.age}</small></b><span>${m.country} · ${m.info.지역}</span></div>
+      <div class="pfnm"><b>${m.name} <small>· ${m.age}</small></b><span>${m.country}</span></div>
     </div>
 
     <div class="pf-gallery">
@@ -868,7 +873,7 @@ function renderProfile(){
       <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
       <div class="ints">
         ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
-        ${pfEdit?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
+        ${pfEdit&&m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
       </div>
     </div>
 
@@ -881,9 +886,9 @@ function renderProfile(){
 
     <div class="pf-sec">
       <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleEdit()">${pfEdit?'완료':'편집'}</span></div>
-      ${Object.entries(m.info).map(([k,v])=>pfEdit
+      ${Object.entries(m.info).map(([k,v])=>(pfEdit&&k!=='성별')
         ? `<div class="info-row edit"><span>${k}</span><input class="info-input" value="${esc(v)}" oninput="infoDraft['${k}']=this.value"></div>`
-        : `<div class="info-row"><span>${k}</span><b>${esc(v)}</b></div>`).join('')}
+        : `<div class="info-row"><span>${k}</span><b>${esc(v)}${(pfEdit&&k==='성별')?'<em class="locked">변경 불가</em>':''}</b></div>`).join('')}
     </div>
 
     ${pfEdit?`<div class="pf-save"><button onclick="saveProfile()">저장하기</button></div>`:''}
@@ -900,9 +905,28 @@ function saveProfile(){
   pfEdit=false;saveProfileLS();renderProfile();toast('✅ 프로필을 저장했어요');
 }
 function addInterest(){
-  const v=prompt('추가할 관심사를 입력하세요');
-  if(v&&v.trim()){myProfile.interests.push(v.trim());saveProfileLS();renderProfile();}
+  if(myProfile.interests.length>=10){toast('관심사는 최대 10개까지 등록할 수 있어요');return;}
+  document.getElementById('interestSheet').innerHTML=`
+    <div class="mgrip"></div>
+    <h2 style="font-size:17px;font-weight:800;padding:0 2px 4px">관심사 추가</h2>
+    <p style="font-size:12.5px;color:var(--sub);padding:0 2px 12px">나를 표현하는 관심사를 입력해주세요 (${myProfile.interests.length}/10)</p>
+    <input id="interestInput" class="interest-input" maxlength="20" placeholder="예: 영화, 등산, 와인" onkeydown="if(event.key==='Enter')submitInterest()">
+    <div class="mbtns">
+      <button class="mbtn no" onclick="closeInterestModal()">취소</button>
+      <button class="mbtn yes" onclick="submitInterest()">추가</button>
+    </div>`;
+  document.getElementById('interestModal').classList.add('on');
+  setTimeout(()=>document.getElementById('interestInput').focus(),60);
 }
+function closeInterestModal(){document.getElementById('interestModal').classList.remove('on');}
+function submitInterest(){
+  const inp=document.getElementById('interestInput');const v=inp.value.trim();
+  if(!v){toast('관심사를 입력해주세요');inp.focus();return;}
+  if(myProfile.interests.length>=10){toast('관심사는 최대 10개까지 등록할 수 있어요');closeInterestModal();return;}
+  if(myProfile.interests.includes(v)){toast('이미 등록된 관심사예요');inp.focus();return;}
+  myProfile.interests.push(v);saveProfileLS();closeInterestModal();renderProfile();
+}
+document.getElementById('interestModal').addEventListener('click',e=>{if(e.target.id==='interestModal')closeInterestModal();});
 function delInterest(i){myProfile.interests.splice(i,1);saveProfileLS();renderProfile();}
 function addPhoto(){
   if(myProfile.photos.length>=10){toast('사진은 최대 10장까지 등록할 수 있어요');return;}
@@ -964,7 +988,7 @@ document.getElementById('photoInput').addEventListener('change',function(e){
   this.value='';
 });
 /* 프로필 로컬 저장 — 다음 접속에도 유지 */
-const PROFILE_KEY='sogon_profile_v1';
+const PROFILE_KEY='sogon_profile_v2';
 function saveProfileLS(){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(myProfile));}catch(err){toast('저장 공간이 부족해요. 사진 수를 줄여보세요');}}
 function loadProfileLS(){try{const s=localStorage.getItem(PROFILE_KEY);if(s)Object.assign(myProfile,JSON.parse(s));}catch(err){}}
 
