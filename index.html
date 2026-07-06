@@ -654,11 +654,22 @@ const discoverPeople=[
 ];
 
 let received=[
-  {n:'Mia',a:35,c:'🇨🇦 캐나다',ph:grad('#7ed3c4','#3E7C74'),new:true,intro:'한국어를 배운 지 4년 됐어요. 차분하게 깊은 대화 나누는 걸 좋아합니다. 좋은 인연이면 좋겠어요 🌿'},
-  {n:'Hans',a:41,c:'🇩🇪 독일',ph:grad('#8fb4d6','#5b8def'),new:true,intro:'엔지니어로 일하고 있고 한국 문화에 관심이 많아요. 진지한 만남을 찾고 있습니다.'},
-  {n:'Yuki',a:37,c:'🇯🇵 일본',ph:grad('#f0a6b8','#c45f72'),new:true,intro:'서울에서 일하고 있어요. 맛집 탐방과 사진 찍는 걸 좋아합니다 📷'},
-  {n:'Clara',a:39,c:'🇮🇹 이탈리아',ph:grad('#b8c98f','#7C8C5A'),new:false,intro:'요리와 와인을 좋아하는 따뜻한 사람이에요. 천천히 알아가요.'},
-  {n:'Noah',a:40,c:'🇦🇺 호주',ph:grad('#f5b27a','#d98e6a'),new:false,intro:'서핑과 여행을 좋아해요. 편하게 이야기 나눠요!'},
+  {n:'Camille',a:35,c:'🇫🇷 프랑스',ph:rw(5),new:true,tags:['전시·미술','와인','여행'],
+   intro:'파리에서 왔고 서울에서 일한 지 1년 됐어요. 조용한 전시와 좋은 와인을 좋아합니다. 천천히 알아가고 싶어요 🌿'},
+  {n:'Aiko',a:33,c:'🇯🇵 일본',ph:rw(20),new:true,tags:['K-드라마','카페','사진'],
+   intro:'드라마로 한국어를 배우고 있어요. 아기자기한 카페 탐방과 사진 찍는 걸 좋아합니다.'},
+  {n:'Grace',a:38,c:'🇺🇸 미국',ph:rw(25),new:true,tags:['영화','등산','요리'],
+   intro:'서울에서 교사로 일해요. 주말엔 산에 오르거나 새로운 요리를 도전해요. 진솔한 대화를 좋아합니다.'},
+  {n:'Freya',a:36,c:'🇬🇧 영국',ph:rw(30),new:true,tags:['독서','재즈','커피'],
+   intro:'책과 재즈를 좋아하는 차분한 사람이에요. 여유로운 주말의 커피 한 잔이 행복이에요.'},
+  {n:'Lucia',a:34,c:'🇪🇸 스페인',ph:rw(42),new:false,tags:['한식 요리','여행','음악'],
+   intro:'한식을 정말 좋아해서 직접 만들어 먹어요. 음악 이야기라면 밤새 할 수 있어요.'},
+  {n:'Maja',a:31,c:'🇸🇪 스웨덴',ph:rw(49),new:false,tags:['K-pop','요가','산책'],
+   intro:'케이팝으로 한국을 알게 됐어요. 요가와 산책을 좋아하는 밝은 성격입니다.'},
+  {n:'Thao',a:32,c:'🇻🇳 베트남',ph:rw(52),new:false,tags:['커피','맛집탐방','영화'],
+   intro:'바리스타로 일해요. 좋은 커피와 맛집 탐방, 잔잔한 영화를 좋아합니다.'},
+  {n:'Diana',a:39,c:'🇷🇴 루마니아',ph:rw(64),new:false,tags:['클래식','미술관','와인'],
+   intro:'클래식 음악과 미술관을 좋아해요. 성숙하고 진지한 만남을 찾고 있습니다.'},
 ];
 
 let chats=[
@@ -904,12 +915,13 @@ function decideReq(accept){
   const p=received[curReq];
   document.getElementById('modal').classList.remove('on');
   if(accept){
-    chats.unshift({id:Date.now(),n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:0,intro:p.intro,tags:p.tags,
+    const id=Date.now();
+    chats.unshift({id,n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:0,intro:p.intro,tags:p.tags,
       msgs:[{sep:'오늘'},{me:false,t:'안녕하세요! 수락해주셔서 감사해요 😊 잘 부탁드려요',time:'지금'}]});
     received.splice(curReq,1);renderGrid();renderChats();
     document.getElementById('chatBadge').textContent=chats.filter(c=>c.unread>0).length;
     toast('🎉 '+p.n+'님과 대화방이 열렸어요');
-    setTimeout(()=>go('chats'),600);
+    setTimeout(()=>{go('chats');openRoom(id);},450);
   }else{
     received.splice(curReq,1);renderGrid();toast(p.n+'님의 신청을 거절했어요');
   }
