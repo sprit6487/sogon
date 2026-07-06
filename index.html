@@ -173,6 +173,10 @@
   .mhero .mnm b{font-size:22px;font-weight:800;}
   .mhero .mnm span{font-size:13px;opacity:.92;display:block;margin-top:2px;}
   .mbody p{font-size:13.5px;line-height:1.7;color:#444;margin-bottom:14px;}
+  .peer-tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px;}
+  .peer-report{text-align:center;margin-top:14px;display:flex;gap:10px;justify-content:center;align-items:center;}
+  .peer-report span{font-size:12.5px;color:#b6b0bb;cursor:pointer;}
+  .peer-report span:not(.dot){text-decoration:underline;}
   .mbtns{display:flex;gap:10px;margin-top:6px;}
   .mbtn{flex:1;text-align:center;padding:15px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;border:none;}
   .mbtn.no{background:#f0eef1;color:#6a626f;}
@@ -278,8 +282,8 @@
   #room.on{display:flex;}
   .rhead{flex:0 0 auto;background:var(--main);color:#fff;display:flex;align-items:center;gap:10px;padding:34px 14px 12px;}
   .rhead .bk{font-size:22px;cursor:pointer;line-height:1;}
-  .rhead .rav{width:38px;height:38px;border-radius:50%;}
-  .rhead .rinfo{flex:1;min-width:0;}
+  .rhead .rav{width:38px;height:38px;border-radius:50%;cursor:pointer;}
+  .rhead .rinfo{flex:1;min-width:0;cursor:pointer;}
   .rhead .rinfo b{font-size:15.5px;font-weight:700;display:block;}
   .rhead .rinfo span{font-size:11.5px;opacity:.9;}
   .rhead .rsearch{font-size:19px;cursor:pointer;padding:4px;}
@@ -430,8 +434,8 @@
     <div id="room">
       <div class="rhead">
         <span class="bk" onclick="closeRoom()">‹</span>
-        <div class="rav" id="rav"></div>
-        <div class="rinfo"><b id="rname">이름</b><span id="rstatus">온라인</span></div>
+        <div class="rav" id="rav" onclick="openPeerProfile()"></div>
+        <div class="rinfo" onclick="openPeerProfile()"><b id="rname">이름</b><span id="rstatus">온라인</span></div>
         <span class="rsearch" onclick="toggleSearch()">🔍</span>
       </div>
       <div class="searchbar" id="searchbar">
@@ -525,6 +529,8 @@
     <div class="modal" id="interestModal"><div class="msheet" id="interestSheet"></div></div>
     <!-- language picker modal -->
     <div class="modal" id="langModal"><div class="msheet" id="langSheet"></div></div>
+    <!-- peer profile modal -->
+    <div class="modal" id="peerModal"><div class="msheet" id="peerSheet"></div></div>
     <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
     <div class="toast" id="toast"></div>
 
@@ -571,6 +577,8 @@ let received=[
 
 let chats=[
   {id:1,n:'Sora',a:36,c:'🇸🇪 스웨덴',ph:grad('#EC92A8','#DB6A85'),online:true,unread:1,
+   intro:'한국 음식을 정말 좋아하는 스웨덴 사람이에요. 함께 요리하고 여행 다니는 걸 꿈꿔요 🥰 서두르지 않고 천천히 알아가고 싶어요.',
+   tags:['요리','여행','한국어 공부'],
    msgs:[
     {sep:'어제'},
     {me:false,t:'안녕하세요! 프로필 잘 봤어요 😊',time:'오후 8:02'},
@@ -583,6 +591,8 @@ let chats=[
     {me:false,t:'다음에 같이 만들어요 🥰',time:'오전 11:25'},
    ]},
   {id:2,n:'Mark',a:39,c:'🇬🇧 영국',ph:grad('#8fb4d6','#5b8def'),online:false,unread:1,
+   intro:'주말이면 한강에서 자전거 타는 걸 좋아하는 영국 사람이에요. 느긋한 대화와 진솔한 만남을 좋아합니다.',
+   tags:['자전거','여행','영화'],
    msgs:[
     {sep:'오늘'},
     {me:false,t:'주말에 한강 가실래요?',time:'오후 2:10'},
@@ -710,7 +720,7 @@ function resolve(type, card){
 
 function createChat(p){
   const id=Date.now()+Math.floor(performance.now());
-  chats.unshift({id,n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:1,
+  chats.unshift({id,n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:1,intro:p.intro,tags:p.tags,
     msgs:[{sep:'오늘'},
       {me:true,t:'(슈퍼라이크로 대화를 시작했어요 ⚡)',time:'지금'},
       {me:false,t:'어머, 슈퍼라이크 감사해요! 😊 반가워요',time:'지금'}]});
@@ -808,7 +818,7 @@ function decideReq(accept){
   const p=received[curReq];
   document.getElementById('modal').classList.remove('on');
   if(accept){
-    chats.unshift({id:Date.now(),n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:0,
+    chats.unshift({id:Date.now(),n:p.n,a:p.a,c:p.c,ph:p.ph,online:true,unread:0,intro:p.intro,tags:p.tags,
       msgs:[{sep:'오늘'},{me:false,t:'안녕하세요! 수락해주셔서 감사해요 😊 잘 부탁드려요',time:'지금'}]});
     received.splice(curReq,1);renderGrid();renderChats();
     document.getElementById('chatBadge').textContent=chats.filter(c=>c.unread>0).length;
@@ -851,6 +861,23 @@ function openRoom(id){
   cancelReply();document.getElementById('searchbar').classList.remove('on');
 }
 function closeRoom(){document.getElementById('room').classList.remove('on');document.getElementById('attmenu').classList.remove('on');}
+
+/* 상대방 프로필 보기 */
+function openPeerProfile(){
+  if(!curRoom)return;const p=curRoom;
+  document.getElementById('peerSheet').innerHTML=`
+    <div class="mgrip"></div>
+    <div class="mhero" style="background:${p.ph}"><div class="msh"></div>
+      <div class="mnm"><b>${p.n} · ${p.a}</b><span>${p.c}${p.online?' · 🟢 온라인':''}</span></div></div>
+    ${p.tags&&p.tags.length?`<div class="peer-tags">${p.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`:''}
+    <div class="mbody"><p>${esc(p.intro||'아직 소개가 없어요. 대화를 나누며 서로를 알아가 보세요 🌿')}</p></div>
+    <button class="mbtn yes" style="width:100%" onclick="closePeerProfile()">닫기</button>
+    <div class="peer-report"><span onclick="closePeerProfile();toast('🚨 '+${JSON.stringify(p.n)}+'님을 신고했어요')">신고하기</span><span class="dot">·</span><span onclick="peerBlock()">차단하기</span></div>`;
+  document.getElementById('peerModal').classList.add('on');
+}
+function closePeerProfile(){document.getElementById('peerModal').classList.remove('on');}
+function peerBlock(){const p=curRoom;closePeerProfile();chats=chats.filter(c=>c.id!==p.id);renderChats();updateChatBadge();closeRoom();toast(p.n+'님을 차단했어요');}
+document.getElementById('peerModal').addEventListener('click',e=>{if(e.target.id==='peerModal')closePeerProfile();});
 
 function attHTML(type){
   if(type==='img')return `<div class="att-img" style="background:${grad('#f5b27a','#d98e6a')}"></div>`;
