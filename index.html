@@ -87,7 +87,8 @@
   .apphead{flex:0 0 auto;background:var(--main);color:#fff;padding:2px 18px 14px;display:flex;align-items:center;justify-content:space-between;}
   .apphead .logo{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
   .apphead .logo small{font-weight:600;font-size:11px;letter-spacing:.2em;opacity:.85;margin-left:4px;}
-  .apphead .hi{font-size:18px;opacity:.92;}
+  .apphead .hi{opacity:.92;cursor:pointer;}
+  .apphead .hi svg{width:21px;height:21px;display:block;}
 
   .view{flex:1 1 auto;position:relative;overflow:hidden;display:none;}
   .view.on{display:flex;flex-direction:column;}
@@ -404,7 +405,7 @@
     <div class="statusbar"><span></span><span></span></div>
     <div class="apphead">
       <div class="logo">SOGON</div>
-      <div class="hi" id="headGear" style="display:none" onclick="openSettings()">⚙️</div>
+      <div class="hi" id="headGear" style="display:none" onclick="openSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
     </div>
 
     <!-- ============ DISCOVER ============ -->
@@ -533,6 +534,8 @@
     <div class="modal" id="interestModal"><div class="msheet" id="interestSheet"></div></div>
     <!-- language picker modal -->
     <div class="modal" id="langModal"><div class="msheet" id="langSheet"></div></div>
+    <!-- country picker modal -->
+    <div class="modal" id="countryModal"><div class="msheet" id="countrySheet"></div></div>
     <!-- peer profile modal -->
     <div class="modal" id="peerModal"><div class="msheet" id="peerSheet"></div></div>
     <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
@@ -974,7 +977,7 @@ let myProfile={
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English']
 };
-let editSection=null, aboutDraft='', birthDraft='', langDraft=[];
+let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='';
 /* 생년월일 → 만 나이(국제 통용) */
 function calcAge(birth){
   if(!birth)return '-';
@@ -1027,6 +1030,9 @@ function renderProfile(){
         : `<div class="info-row"><span>나이</span><b>${calcAge(m.birth)}세</b></div>`}
       <div class="info-row"><span>성별</span><b>${m.gender}${editSection==='info'?'<em class="locked">변경 불가</em>':''}</b></div>
       ${editSection==='info'
+        ? `<div class="info-row edit lang-row" onclick="openCountryPicker()"><span>국적</span><b class="lang-field">${countryDraft||'선택'} <span class="caret">▾</span></b></div>`
+        : `<div class="info-row"><span>국적</span><b>${m.country}</b></div>`}
+      ${editSection==='info'
         ? `<div class="info-row edit lang-row" onclick="openLangPicker()"><span>언어</span><b class="lang-field">${langDraft.length?langDraft.join(', '):'선택'} <span class="caret">▾</span></b></div>`
         : `<div class="info-row"><span>언어</span><b>${m.languages.join(', ')}</b></div>`}
     </div>
@@ -1039,12 +1045,12 @@ function toggleSection(sec){
   if(editSection)saveSection(editSection);
   editSection=sec;
   if(sec==='about')aboutDraft=myProfile.about;
-  if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];}
+  if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];countryDraft=myProfile.country;}
   renderProfile();
 }
 function saveSection(sec){
   if(sec==='about'){if(aboutDraft)myProfile.about=aboutDraft;}
-  if(sec==='info'){myProfile.birth=birthDraft;myProfile.languages=[...langDraft];}
+  if(sec==='info'){myProfile.birth=birthDraft;myProfile.languages=[...langDraft];myProfile.country=countryDraft;}
   saveProfileLS();
   if(sec!=='interests')toast('✅ 저장했어요');
 }
@@ -1070,6 +1076,21 @@ function toggleLang(l){
 }
 function closeLangPicker(){document.getElementById('langModal').classList.remove('on');renderProfile();}
 document.getElementById('langModal').addEventListener('click',e=>{if(e.target.id==='langModal')closeLangPicker();});
+/* 국적 단일 선택 */
+const COUNTRIES=['🇰🇷 한국','🇺🇸 미국','🇬🇧 영국','🇨🇦 캐나다','🇦🇺 호주','🇩🇪 독일','🇫🇷 프랑스','🇪🇸 스페인','🇮🇹 이탈리아','🇸🇪 스웨덴','🇳🇱 네덜란드','🇷🇺 러시아','🇯🇵 일본','🇨🇳 중국','🇹🇼 대만','🇻🇳 베트남','🇹🇭 태국','🇵🇭 필리핀','🇮🇩 인도네시아','🇮🇳 인도','🇧🇷 브라질','🇲🇽 멕시코'];
+function openCountryPicker(){renderCountrySheet();document.getElementById('countryModal').classList.add('on');}
+function renderCountrySheet(){
+  document.getElementById('countrySheet').innerHTML=`
+    <div class="mgrip"></div>
+    <h2 style="font-size:17px;font-weight:800;padding:0 2px 4px">국적 선택</h2>
+    <p style="font-size:12.5px;color:var(--sub);padding:0 2px 8px">어느 나라 사람인지 선택해주세요</p>
+    <div class="lang-list">
+      ${COUNTRIES.map(c=>`<div class="lang-opt ${countryDraft===c?'sel':''}" onclick="pickCountry('${c}')"><span>${c}</span><span class="lchk">${countryDraft===c?'✓':''}</span></div>`).join('')}
+    </div>`;
+}
+function pickCountry(c){countryDraft=c;document.getElementById('countryModal').classList.remove('on');renderProfile();}
+function closeCountryPicker(){document.getElementById('countryModal').classList.remove('on');renderProfile();}
+document.getElementById('countryModal').addEventListener('click',e=>{if(e.target.id==='countryModal')closeCountryPicker();});
 function addInterest(){
   if(myProfile.interests.length>=10){toast('관심사는 최대 10개까지 등록할 수 있어요');return;}
   document.getElementById('interestSheet').innerHTML=`
