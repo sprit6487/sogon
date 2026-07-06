@@ -876,10 +876,11 @@ function openPeerProfile(){
     ${p.tags&&p.tags.length?`<div class="peer-tags">${p.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`:''}
     <div class="mbody"><p>${esc(p.intro||'아직 소개가 없어요. 대화를 나누며 서로를 알아가 보세요 🌿')}</p></div>
     <button class="mbtn yes" style="width:100%" onclick="closePeerProfile()">닫기</button>
-    <div class="peer-report"><span onclick="closePeerProfile();toast('🚨 '+${JSON.stringify(p.n)}+'님을 신고했어요')">신고하기</span><span class="dot">·</span><span onclick="peerBlock()">차단하기</span></div>`;
+    <div class="peer-report"><span onclick="peerReport()">신고하기</span><span class="dot">·</span><span onclick="peerBlock()">차단하기</span></div>`;
   document.getElementById('peerModal').classList.add('on');
 }
 function closePeerProfile(){document.getElementById('peerModal').classList.remove('on');}
+function peerReport(){const n=curRoom?curRoom.n:'';closePeerProfile();toast('🚨 '+n+'님을 신고했어요');}
 function peerBlock(){const p=curRoom;closePeerProfile();chats=chats.filter(c=>c.id!==p.id);renderChats();updateChatBadge();closeRoom();toast(p.n+'님을 차단했어요');}
 document.getElementById('peerModal').addEventListener('click',e=>{if(e.target.id==='peerModal')closePeerProfile();});
 
