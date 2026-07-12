@@ -1283,27 +1283,36 @@ function saveSection(sec){
   if(sec!=='interests')toast('✅ 저장했어요');
 }
 function updateAgePreview(){const el=document.getElementById('agePreview');if(el)el.textContent=calcAge(birthDraft)+'세';}
-/* 언어 멀티 선택 (최대 3개) */
-const LANGS=['한국어','English','日本語','中文','Español','Français','Deutsch','Italiano','Русский','Português','Tiếng Việt','ภาษาไทย'];
+/* 언어 멀티 선택 (최대 3개, 검색) */
+const LANGS=['한국어','English','日本語','中文','廣東話','Español','Français','Deutsch','Italiano','Português','Nederlands','Русский','Українська','Polski','Čeština','Svenska','Norsk','Dansk','Suomi','Magyar','Ελληνικά','Română','Türkçe','العربية','עברית','فارسی','हिन्दी','বাংলা','اردو','Bahasa Indonesia','Bahasa Melayu','ไทย','Tiếng Việt','Filipino','Kiswahili'];
+function langOptsHTML(q,selArr,fn){
+  const ql=(q||'').trim().toLowerCase();
+  const list=LANGS.filter(l=>!ql||l.toLowerCase().includes(ql));
+  if(!list.length)return '<div class="no-result">검색 결과가 없어요</div>';
+  return list.map(l=>`<div class="lang-opt ${selArr.includes(l)?'sel':''}" onclick="${fn}('${l}')"><span>${l}</span><span class="lchk">${selArr.includes(l)?'✓':''}</span></div>`).join('');
+}
 function openLangPicker(){renderLangSheet();document.getElementById('langModal').classList.add('on');}
 function renderLangSheet(){
   document.getElementById('langSheet').innerHTML=`
     <div class="mgrip"></div>
     <h2 style="font-size:17px;font-weight:800;padding:0 2px 4px">언어 선택</h2>
-    <p style="font-size:12.5px;color:var(--sub);padding:0 2px 8px">최대 3개까지 선택할 수 있어요 (${langDraft.length}/3)</p>
-    <div class="lang-list">
-      ${LANGS.map(l=>`<div class="lang-opt ${langDraft.includes(l)?'sel':''}" onclick="toggleLang('${l}')"><span>${l}</span><span class="lchk">${langDraft.includes(l)?'✓':''}</span></div>`).join('')}
-    </div>
-    <button class="mbtn yes" style="width:100%" onclick="closeLangPicker()">완료</button>`;
+    <p style="font-size:12.5px;color:var(--sub);padding:0 2px 8px">최대 3개까지 선택할 수 있어요 (<span id="lpCount">${langDraft.length}</span>/3)</p>
+    <input class="cp-search" id="lpSearch" placeholder="언어 검색 (예: English, 中文)" oninput="lpFilter(this.value)">
+    <div id="lpLangList" class="lang-list">${langOptsHTML('',langDraft,'toggleLang')}</div>
+    <button class="mbtn yes" style="width:100%;margin-top:10px" onclick="closeLangPicker()">완료</button>`;
 }
+function lpFilter(q){document.getElementById('lpLangList').innerHTML=langOptsHTML(q,langDraft,'toggleLang');}
 function toggleLang(l){
   const i=langDraft.indexOf(l);
   if(i>=0)langDraft.splice(i,1);
   else{if(langDraft.length>=3){toast('언어는 최대 3개까지 선택할 수 있어요');return;}langDraft.push(l);}
-  renderLangSheet();
+  const q=(document.getElementById('lpSearch')||{}).value||'';
+  document.getElementById('lpLangList').innerHTML=langOptsHTML(q,langDraft,'toggleLang');
+  const cnt=document.getElementById('lpCount');if(cnt)cnt.textContent=langDraft.length;
 }
 function closeLangPicker(){document.getElementById('langModal').classList.remove('on');renderProfile();}
 document.getElementById('langModal').addEventListener('click',e=>{if(e.target.id==='langModal')closeLangPicker();});
+function sgFilterLang(q){const el=document.getElementById('sgLangList');if(el)el.innerHTML=langOptsHTML(q,myProfile.languages,'sgToggleLang');}
 /* 국적 단일 선택 (전세계 + 검색) */
 const COUNTRIES=['🇰🇷 한국','🇺🇸 미국','🇯🇵 일본','🇨🇳 중국','🇬🇧 영국','🇨🇦 캐나다','🇦🇺 호주','🇩🇪 독일','🇫🇷 프랑스','🇪🇸 스페인','🇮🇹 이탈리아','🇳🇱 네덜란드','🇹🇼 대만','🇭🇰 홍콩','🇻🇳 베트남','🇹🇭 태국','🇵🇭 필리핀','🇮🇩 인도네시아','🇲🇾 말레이시아','🇸🇬 싱가포르','🇮🇳 인도','🇳🇵 네팔','🇵🇰 파키스탄','🇧🇩 방글라데시','🇱🇰 스리랑카','🇲🇲 미얀마','🇰🇭 캄보디아','🇱🇦 라오스','🇲🇳 몽골','🇰🇿 카자흐스탄','🇺🇿 우즈베키스탄','🇹🇷 튀르키예','🇸🇦 사우디아라비아','🇦🇪 아랍에미리트','🇮🇱 이스라엘','🇮🇷 이란','🇮🇶 이라크','🇶🇦 카타르','🇰🇼 쿠웨이트','🇯🇴 요르단','🇱🇧 레바논','🇵🇹 포르투갈','🇧🇪 벨기에','🇨🇭 스위스','🇦🇹 오스트리아','🇸🇪 스웨덴','🇳🇴 노르웨이','🇩🇰 덴마크','🇫🇮 핀란드','🇮🇸 아이슬란드','🇮🇪 아일랜드','🇵🇱 폴란드','🇨🇿 체코','🇭🇺 헝가리','🇬🇷 그리스','🇷🇴 루마니아','🇧🇬 불가리아','🇭🇷 크로아티아','🇷🇸 세르비아','🇺🇦 우크라이나','🇷🇺 러시아','🇸🇰 슬로바키아','🇸🇮 슬로베니아','🇱🇹 리투아니아','🇱🇻 라트비아','🇪🇪 에스토니아','🇱🇺 룩셈부르크','🇲🇹 몰타','🇨🇾 키프로스','🇲🇽 멕시코','🇧🇷 브라질','🇦🇷 아르헨티나','🇨🇱 칠레','🇨🇴 콜롬비아','🇵🇪 페루','🇻🇪 베네수엘라','🇪🇨 에콰도르','🇺🇾 우루과이','🇵🇾 파라과이','🇧🇴 볼리비아','🇨🇺 쿠바','🇨🇷 코스타리카','🇵🇦 파나마','🇬🇹 과테말라','🇩🇴 도미니카공화국','🇳🇿 뉴질랜드','🇫🇯 피지','🇪🇬 이집트','🇿🇦 남아프리카공화국','🇳🇬 나이지리아','🇰🇪 케냐','🇲🇦 모로코','🇩🇿 알제리','🇹🇳 튀니지','🇬🇭 가나','🇪🇹 에티오피아','🇹🇿 탄자니아','🇺🇬 우간다'];
 function ctyHTML(c){const i=c.indexOf(' ');return `<span class="flag-badge">${c.slice(0,i)}</span><span class="cty-name">${c.slice(i+1)}</span>`;}
@@ -1561,10 +1570,9 @@ function renderSignup(){
       <input class="cp-search" placeholder="국가 검색 (예: 한국, 미국)" oninput="sgFilterCountry(this.value)">
       <div id="sgCountryList" class="lang-list">${countryOptsHTML('',m.country,'sgPickCountry')}</div>`;
   }else if(st===3){
-    content=`<div class="lang-list sg-list">
-      ${LANGS.map(l=>`<div class="lang-opt ${m.languages.includes(l)?'sel':''}" onclick="sgToggleLang('${l}')"><span>${l}</span><span class="lchk">${m.languages.includes(l)?'✓':''}</span></div>`).join('')}
-    </div>
-    <p class="sg-hint">${m.languages.length}/3 선택됨</p>`;
+    content=`<input class="cp-search" id="sgLangSearch" placeholder="언어 검색 (예: English, 中文)" oninput="sgFilterLang(this.value)">
+      <div id="sgLangList" class="lang-list">${langOptsHTML('',m.languages,'sgToggleLang')}</div>
+      <p class="sg-hint"><span id="sgLangCount">${m.languages.length}</span>/3 선택됨</p>`;
   }else if(st===4){
     content=`<div class="ints editing sg-ints">
       ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
@@ -1632,7 +1640,9 @@ function sgToggleLang(l){
   const i=myProfile.languages.indexOf(l);
   if(i>=0)myProfile.languages.splice(i,1);
   else{if(myProfile.languages.length>=3){toast('언어는 최대 3개까지 선택할 수 있어요');return;}myProfile.languages.push(l);}
-  renderSignup();
+  const q=(document.getElementById('sgLangSearch')||{}).value||'';
+  const el=document.getElementById('sgLangList');if(el)el.innerHTML=langOptsHTML(q,myProfile.languages,'sgToggleLang');
+  const cnt=document.getElementById('sgLangCount');if(cnt)cnt.textContent=myProfile.languages.length;
 }
 function sgPrev(){if(signupStep>0){signupStep--;renderSignup();}}
 function sgNext(){
