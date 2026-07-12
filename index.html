@@ -234,6 +234,27 @@
   .lang-opt:last-child{border-bottom:none;}
   .lang-opt.sel{color:var(--main);font-weight:700;}
   .lang-opt .lchk{color:var(--main);font-weight:800;}
+  /* birthdate calendar */
+  .sg-datebtn{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .sg-datebtn.ph>span:first-child{color:var(--sub);}
+  .sg-datebtn .cal-ic{display:flex;color:var(--sub);}
+  .sg-datebtn .cal-ic svg{width:19px;height:19px;}
+  .cal-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 12px;}
+  .cal-nav{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--ink);cursor:pointer;border-radius:50%;}
+  .cal-nav.dis{color:#d8d3da;cursor:default;}
+  .cal-title{font-size:16px;font-weight:800;cursor:pointer;}
+  .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+  .cal-dow span{text-align:center;font-size:12px;color:var(--sub);padding:6px 0;}
+  .cal-dow span:first-child{color:#e0566e;}
+  .cal-dow span:last-child{color:#5b8def;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-bottom:8px;}
+  .cal-cell{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:14px;border-radius:50%;cursor:pointer;color:var(--ink);}
+  .cal-cell.empty{cursor:default;}
+  .cal-cell.dis{color:#dbd6dd;cursor:default;}
+  .cal-cell.sel{background:var(--main);color:#fff;font-weight:700;}
+  .year-list{max-height:52vh;overflow-y:auto;padding-bottom:6px;}
+  .year-opt{text-align:center;padding:12px;font-size:15px;cursor:pointer;border-radius:10px;}
+  .year-opt.sel{background:var(--main);color:#fff;font-weight:700;}
   .pf-save{margin:4px 14px 22px;}
   .pf-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
   .pf-logout{padding:2px 14px 28px;}
@@ -581,6 +602,8 @@
     <div class="modal" id="langModal"><div class="msheet" id="langSheet"></div></div>
     <!-- country picker modal -->
     <div class="modal" id="countryModal"><div class="msheet" id="countrySheet"></div></div>
+    <!-- birthdate calendar modal -->
+    <div class="modal" id="birthModal"><div class="msheet" id="birthSheet"></div></div>
     <!-- peer profile modal -->
     <div class="modal" id="peerModal"><div class="msheet" id="peerSheet"></div></div>
     <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
@@ -1187,7 +1210,7 @@ function renderProfile(){
     <div class="pf-sec">
       <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleSection('info')">${editSection==='info'?'완료':'편집'}</span></div>
       ${editSection==='info'
-        ? `<div class="info-row edit"><span>생년월일</span><input type="date" class="info-input date-input" id="birthInput" value="${birthDraft}" max="${maxBirth}" onchange="birthDraft=this.value;updateAgePreview()"></div>
+        ? `<div class="info-row edit lang-row" onclick="openBirthPicker('edit')"><span>생년월일</span><b class="lang-field">${birthDraft?fmtBirth(birthDraft):'선택'} <span class="caret">▾</span></b></div>
            <div class="info-row"><span>나이</span><b id="agePreview">${calcAge(birthDraft)}세</b></div>`
         : `<div class="info-row"><span>나이</span><b>${calcAge(m.birth)}세</b></div>`}
       <div class="info-row"><span>성별</span><b>${m.gender}${editSection==='info'?'<em class="locked">변경 불가</em>':''}</b></div>
@@ -1253,6 +1276,63 @@ function renderCountrySheet(){
 function pickCountry(c){countryDraft=c;document.getElementById('countryModal').classList.remove('on');renderProfile();}
 function closeCountryPicker(){document.getElementById('countryModal').classList.remove('on');renderProfile();}
 document.getElementById('countryModal').addEventListener('click',e=>{if(e.target.id==='countryModal')closeCountryPicker();});
+
+/* 생년월일 달력 피커 (직접 입력 불가, 달력으로만) */
+let birthCtx=null;
+function fmtBirth(s){if(!s)return '';const d=new Date(s);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;}
+function openBirthPicker(mode){
+  const cur=mode==='signup'?myProfile.birth:birthDraft;
+  let y,m;
+  if(cur){const d=new Date(cur);y=d.getFullYear();m=d.getMonth();}else{y=new Date().getFullYear()-30;m=0;}
+  birthCtx={mode,y,m,sel:cur,yearMode:false};
+  renderBirthCal();
+  document.getElementById('birthModal').classList.add('on');
+}
+function closeBirthPicker(){document.getElementById('birthModal').classList.remove('on');}
+function renderBirthCal(){
+  const {y,m,sel,yearMode}=birthCtx;
+  const today=new Date();const maxD=new Date(today.getFullYear()-18,today.getMonth(),today.getDate());
+  let inner;
+  if(yearMode){
+    const maxY=today.getFullYear()-18,minY=today.getFullYear()-100;let ys='';
+    for(let yr=maxY;yr>=minY;yr--)ys+=`<div class="year-opt${yr===y?' sel':''}" onclick="pickYear(${yr})">${yr}년</div>`;
+    inner=`<div class="year-list" id="yearList">${ys}</div>`;
+  }else{
+    const first=new Date(y,m,1).getDay();const dim=new Date(y,m+1,0).getDate();
+    const selD=sel?new Date(sel):null;
+    let cells='';for(let i=0;i<first;i++)cells+='<div class="cal-cell empty"></div>';
+    for(let d=1;d<=dim;d++){
+      const cd=new Date(y,m,d);const dis=cd>maxD;
+      const isSel=selD&&selD.getFullYear()===y&&selD.getMonth()===m&&selD.getDate()===d;
+      cells+=`<div class="cal-cell${dis?' dis':''}${isSel?' sel':''}" ${dis?'':`onclick="pickBirth(${y},${m},${d})"`}>${d}</div>`;
+    }
+    inner=`<div class="cal-dow">${['일','월','화','수','목','금','토'].map(w=>`<span>${w}</span>`).join('')}</div><div class="cal-grid">${cells}</div>`;
+  }
+  const canNext=new Date(y,m+1,1)<=maxD;
+  document.getElementById('birthSheet').innerHTML=`
+    <div class="mgrip"></div>
+    <div class="cal-head">
+      <span class="cal-nav" onclick="calMove(-1)">‹</span>
+      <span class="cal-title" onclick="toggleYearMode()">${y}년 ${m+1}월 ▾</span>
+      <span class="cal-nav${canNext?'':' dis'}" onclick="${canNext?'calMove(1)':''}">›</span>
+    </div>
+    ${inner}`;
+  if(yearMode){const yl=document.getElementById('yearList');const s=yl&&yl.querySelector('.sel');if(s)s.scrollIntoView({block:'center'});}
+}
+function calMove(delta){let m=birthCtx.m+delta,y=birthCtx.y;if(m<0){m=11;y--;}if(m>11){m=0;y++;}birthCtx.y=y;birthCtx.m=m;renderBirthCal();}
+function toggleYearMode(){birthCtx.yearMode=!birthCtx.yearMode;renderBirthCal();}
+function pickYear(yr){
+  const today=new Date();const maxD=new Date(today.getFullYear()-18,today.getMonth(),today.getDate());
+  birthCtx.y=yr;if(new Date(yr,birthCtx.m,1)>maxD)birthCtx.m=maxD.getMonth();
+  birthCtx.yearMode=false;renderBirthCal();
+}
+function pickBirth(y,mo,dd){
+  const val=`${y}-${String(mo+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+  closeBirthPicker();
+  if(birthCtx.mode==='signup'){myProfile.birth=val;renderSignup();}
+  else{birthDraft=val;renderProfile();}
+}
+document.getElementById('birthModal').addEventListener('click',e=>{if(e.target.id==='birthModal')closeBirthPicker();});
 function addInterest(){
   if(myProfile.interests.length>=10){toast('관심사는 최대 10개까지 등록할 수 있어요');return;}
   document.getElementById('interestSheet').innerHTML=`
@@ -1406,7 +1486,7 @@ function renderSignup(){
   }else if(st===1){
     content=`
       <div class="sg-field"><label>생년월일</label>
-        <input type="date" class="sg-input" value="${m.birth}" max="${maxBirth}" onchange="myProfile.birth=this.value;renderSignup()"></div>
+        <div class="sg-input sg-datebtn${m.birth?'':' ph'}" onclick="openBirthPicker('signup')"><span>${m.birth?fmtBirth(m.birth):'생년월일을 선택하세요'}</span><span class="cal-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div></div>
       ${m.birth?`<div class="sg-age">만 ${calcAge(m.birth)}세</div>`:''}
       <div class="sg-field"><label>성별</label>
         <div class="sg-gender">
