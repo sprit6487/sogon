@@ -556,6 +556,7 @@
         <div class="set-foot">
           <button class="lo" onclick="closeSettings();logout()">로그아웃</button>
           <div class="set-withdraw"><span onclick="toast('회원 탈퇴는 고객센터를 통해 진행돼요')">회원 탈퇴</span></div>
+          <div class="set-withdraw" style="margin-top:12px"><span onclick="resetProfile()">프로필 초기화 (회원가입 다시하기)</span></div>
         </div>
 
       </div>
@@ -1346,6 +1347,12 @@ setTimeout(hideSplash,2600);
 /* settings */
 function openSettings(){document.getElementById('settings').classList.add('on');}
 function closeSettings(){document.getElementById('settings').classList.remove('on');}
+function resetProfile(){
+  try{localStorage.removeItem(PROFILE_KEY);}catch(e){}
+  closeSettings();
+  openSignup();
+  toast('프로필을 초기화했어요');
+}
 
 /* login / logout */
 function doLogin(provider){
