@@ -85,6 +85,12 @@
   .apphead .logo small{font-weight:600;font-size:11px;letter-spacing:.2em;opacity:.85;margin-left:4px;}
   .apphead .hi{opacity:.92;cursor:pointer;}
   .apphead .hi svg{width:21px;height:21px;display:block;}
+  .apphead #headMatch svg{width:23px;height:23px;}
+  #matchPanel{position:absolute;inset:0;z-index:48;background:var(--bg);display:none;flex-direction:column;}
+  #matchPanel.on{display:flex;}
+  .mp-body{flex:1;overflow-y:auto;padding:22px 20px 26px;}
+  .mp-save{margin-top:22px;}
+  .mp-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
 
   .view{flex:1 1 auto;position:relative;overflow:hidden;display:none;}
   .view.on{display:flex;flex-direction:column;}
@@ -511,6 +517,7 @@
     <div class="statusbar"><span></span><span></span></div>
     <div class="apphead">
       <div class="logo">SOGON</div>
+      <div class="hi" id="headMatch" style="display:none" onclick="openMatchPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="8" x2="21" y2="8"/><circle cx="15" cy="8" r="3" fill="#DB6A85"/><line x1="3" y1="16" x2="21" y2="16"/><circle cx="9" cy="16" r="3" fill="#DB6A85"/></svg></div>
       <div class="hi" id="headGear" style="display:none" onclick="openSettings()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
     </div>
 
@@ -616,6 +623,12 @@
         </div>
 
       </div>
+    </div>
+
+    <!-- ============ MATCH PANEL ============ -->
+    <div id="matchPanel">
+      <div class="set-head"><span class="bk" onclick="closeMatchPanel()">‹</span><b>매칭 설정</b></div>
+      <div class="mp-body" id="mpBody"></div>
     </div>
 
     <!-- ============ SIGNUP ============ -->
@@ -800,11 +813,13 @@ let chats=[
 
 /* ============ NAV ============ */
 function go(v){
+  if(typeof editSection!=='undefined'&&editSection){editSection=null;renderProfile();}
   document.querySelectorAll('.view').forEach(e=>e.classList.remove('on'));
   document.getElementById(v).classList.add('on');
   document.querySelectorAll('.bnav .bi').forEach(e=>e.classList.remove('on'));
   const nav=document.getElementById('nav-'+v); if(nav)nav.classList.add('on');
   document.getElementById('headGear').style.display=(v==='profile')?'block':'none';
+  document.getElementById('headMatch').style.display=(v==='discover')?'block':'none';
   closeRoom();
 }
 
@@ -1195,6 +1210,44 @@ let myProfile={
   match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
+function matchControlsHTML(){
+  return `<div class="mr-field"><div class="mr-head">관심 성별</div>
+       <div class="gender-mini">${['남성','여성','모두'].map(g=>`<span class="gm ${matchDraft.gender===g?'sel':''}" onclick="matchDraft.gender='${g}';refreshMatch()">${g}</span>`).join('')}</div></div>
+     <div class="mr-field"><div class="mr-head">관심 나이 <b id="ageLabel">${matchDraft.ageMin} ~ ${matchDraft.ageMax}세</b></div>
+       <div class="age-range">
+         <div class="rail"></div>
+         <div class="fill" id="ageFill" style="left:${(matchDraft.ageMin-19)/46*100}%;width:${(matchDraft.ageMax-matchDraft.ageMin)/46*100}%"></div>
+         <input type="range" id="ageMinR" min="19" max="65" value="${matchDraft.ageMin}" oninput="ageSlide('min')">
+         <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
+       </div></div>
+     <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distMin}km ~ ${matchDraft.distMax>500?'제한없음':matchDraft.distMax+'km'}</b></div>
+       <div class="age-range">
+         <div class="rail"></div>
+         <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/500*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/500*100}%"></div>
+         <input type="range" id="distMinR" min="10" max="510" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
+         <input type="range" id="distMaxR" min="10" max="510" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
+       </div></div>`;
+}
+function refreshMatch(){
+  const mp=document.getElementById('matchPanel');
+  if(mp&&mp.classList.contains('on'))renderMatchPanel();else renderProfile();
+}
+function openMatchPanel(){
+  matchDraft={...myProfile.match};
+  if(matchDraft.distMin==null)matchDraft.distMin=10;
+  if(matchDraft.distMax==null)matchDraft.distMax=(matchDraft.distance>=10?matchDraft.distance:100);
+  renderMatchPanel();
+  document.getElementById('matchPanel').classList.add('on');
+}
+function renderMatchPanel(){
+  document.getElementById('mpBody').innerHTML=matchControlsHTML()+`<div class="mp-save"><button onclick="saveMatchPanel()">저장</button></div>`;
+}
+function saveMatchPanel(){
+  myProfile.match={...matchDraft};saveProfileLS();
+  document.getElementById('matchPanel').classList.remove('on');
+  toast('✅ 매칭 설정을 저장했어요');
+}
+function closeMatchPanel(){document.getElementById('matchPanel').classList.remove('on');}
 function ageSlide(which){
   let mn=+document.getElementById('ageMinR').value, mx=+document.getElementById('ageMaxR').value;
   if(mn>mx){if(which==='min'){mx=mn;document.getElementById('ageMaxR').value=mx;}else{mn=mx;document.getElementById('ageMinR').value=mn;}}
@@ -1288,22 +1341,7 @@ function renderProfile(){
     <div class="pf-sec">
       <div class="sec-h"><b>매칭 설정</b><span class="ed" onclick="toggleSection('match')">${editSection==='match'?'완료':'편집'}</span></div>
       ${editSection==='match'
-        ? `<div class="mr-field"><div class="mr-head">관심 성별</div>
-             <div class="gender-mini">${['남성','여성','모두'].map(g=>`<span class="gm ${matchDraft.gender===g?'sel':''}" onclick="matchDraft.gender='${g}';renderProfile()">${g}</span>`).join('')}</div></div>
-           <div class="mr-field"><div class="mr-head">관심 나이 <b id="ageLabel">${matchDraft.ageMin} ~ ${matchDraft.ageMax}세</b></div>
-             <div class="age-range">
-               <div class="rail"></div>
-               <div class="fill" id="ageFill" style="left:${(matchDraft.ageMin-19)/46*100}%;width:${(matchDraft.ageMax-matchDraft.ageMin)/46*100}%"></div>
-               <input type="range" id="ageMinR" min="19" max="65" value="${matchDraft.ageMin}" oninput="ageSlide('min')">
-               <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
-             </div></div>
-           <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distMin}km ~ ${matchDraft.distMax>500?'제한없음':matchDraft.distMax+'km'}</b></div>
-             <div class="age-range">
-               <div class="rail"></div>
-               <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/500*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/500*100}%"></div>
-               <input type="range" id="distMinR" min="10" max="510" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
-               <input type="range" id="distMaxR" min="10" max="510" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
-             </div></div>`
+        ? matchControlsHTML()
         : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
            <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
            <div class="info-row"><span>거리</span><b>${(m.match.distMin??10)}km ~ ${(m.match.distMax??100)>500?'제한없음':(m.match.distMax??100)+'km'}</b></div>`}
