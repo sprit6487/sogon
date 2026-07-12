@@ -1363,7 +1363,7 @@ function doLogin(provider){
   document.getElementById('login').classList.add('hide');
   toast(provider+' 계정으로 로그인했어요');
   if(profileComplete()){go('discover');}
-  else{setTimeout(openSignup,300);}
+  else{openSignup();}
 }
 function logout(){
   document.getElementById('login').classList.remove('hide');
