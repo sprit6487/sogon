@@ -1207,9 +1207,9 @@ function distSlide(which){
   let mn=+document.getElementById('distMinR').value, mx=+document.getElementById('distMaxR').value;
   if(mn>mx){if(which==='min'){mx=mn;document.getElementById('distMaxR').value=mx;}else{mn=mx;document.getElementById('distMinR').value=mn;}}
   matchDraft.distMin=mn;matchDraft.distMax=mx;
-  const l=(mn-10)/490*100, r=(mx-10)/490*100;
+  const l=(mn-10)/500*100, r=(mx-10)/500*100;
   const f=document.getElementById('distFill');if(f){f.style.left=l+'%';f.style.width=(r-l)+'%';}
-  const lb=document.getElementById('distLabel');if(lb)lb.textContent=mn+'km ~ '+(mx>=500?'제한없음':mx+'km');
+  const lb=document.getElementById('distLabel');if(lb)lb.textContent=mn+'km ~ '+(mx>500?'제한없음':mx+'km');
 }
 function countryLocked(){if(!myProfile.countryChangedAt)return false;const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return new Date()<n;}
 function countryNextDate(){const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return `${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;}
@@ -1297,16 +1297,16 @@ function renderProfile(){
                <input type="range" id="ageMinR" min="19" max="65" value="${matchDraft.ageMin}" oninput="ageSlide('min')">
                <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
              </div></div>
-           <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distMin}km ~ ${matchDraft.distMax>=500?'제한없음':matchDraft.distMax+'km'}</b></div>
+           <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distMin}km ~ ${matchDraft.distMax>500?'제한없음':matchDraft.distMax+'km'}</b></div>
              <div class="age-range">
                <div class="rail"></div>
-               <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/490*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/490*100}%"></div>
-               <input type="range" id="distMinR" min="10" max="500" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
-               <input type="range" id="distMaxR" min="10" max="500" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
+               <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/500*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/500*100}%"></div>
+               <input type="range" id="distMinR" min="10" max="510" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
+               <input type="range" id="distMaxR" min="10" max="510" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
              </div></div>`
         : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
            <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
-           <div class="info-row"><span>거리</span><b>${(m.match.distMin??10)}km ~ ${(m.match.distMax??100)>=500?'제한없음':(m.match.distMax??100)+'km'}</b></div>`}
+           <div class="info-row"><span>거리</span><b>${(m.match.distMin??10)}km ~ ${(m.match.distMax??100)>500?'제한없음':(m.match.distMax??100)+'km'}</b></div>`}
     </div>
 
    </div>`;
