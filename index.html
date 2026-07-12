@@ -517,7 +517,7 @@
 
     <!-- ============ RECEIVED ============ -->
     <div class="view" id="received">
-      <div class="vhead"><h2>받은 신청</h2><p>나를 선택한 사람들이에요 · 탭하면 프로필을 보고 수락/거절할 수 있어요</p></div>
+      <div class="vhead"><h2>받은 신청</h2><p>나를 선택한 사람들이에요<br>탭하면 프로필을 보고 수락/거절할 수 있어요</p></div>
       <div class="grid" id="grid"></div>
     </div>
 
@@ -1182,10 +1182,12 @@ let myProfile={
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false,
-  match:{gender:'여성', ageMin:30, ageMax:45, distance:50}
+  match:{gender:'여성', ageMin:30, ageMax:45, distance:50}, countryChangedAt:null
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
 function ageOpts(sel){let o='';for(let a=19;a<=65;a++)o+=`<option value="${a}"${a===sel?' selected':''}>${a}</option>`;return o;}
+function countryLocked(){if(!myProfile.countryChangedAt)return false;const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return new Date()<n;}
+function countryNextDate(){const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return `${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;}
 /* 생년월일 → 만 나이(국제 통용) */
 function calcAge(birth){
   if(!birth)return '-';
@@ -1247,7 +1249,11 @@ function renderProfile(){
                <div class="edit-hint">성별은 1회만 변경할 수 있어요</div>`)
         : `<div class="info-row"><span>성별</span><b>${m.gender}</b></div>`}
       ${editSection==='info'
-        ? `<div class="info-row edit lang-row" onclick="openCountryPicker()"><span>국적</span><b class="lang-field">${countryDraft||'선택'} <span class="caret">▾</span></b></div>`
+        ? (countryLocked()
+            ? `<div class="info-row"><span>국적</span><b>${m.country}<em class="locked">변경 불가</em></b></div>
+               <div class="edit-hint">국적은 1년에 한 번만 변경할 수 있어요 (다음 변경: ${countryNextDate()})</div>`
+            : `<div class="info-row edit lang-row" onclick="openCountryPicker()"><span>국적</span><b class="lang-field">${countryDraft||'선택'} <span class="caret">▾</span></b></div>
+               <div class="edit-hint">국적은 1년에 한 번만 변경할 수 있어요</div>`)
         : `<div class="info-row"><span>국적</span><b>${m.country}</b></div>`}
       ${editSection==='info'
         ? `<div class="info-row edit lang-row" onclick="openLangPicker()"><span>언어</span><b class="lang-field">${langDraft.length?langDraft.join(', '):'선택'} <span class="caret">▾</span></b></div>`
@@ -1269,7 +1275,6 @@ function renderProfile(){
            <div class="info-row"><span>거리</span><b>${m.match.distance===0?'제한 없음':m.match.distance+'km 이내'}</b></div>`}
     </div>
 
-    <div class="pf-logout"><button onclick="logout()">로그아웃</button></div>
    </div>`;
 }
 function toggleSection(sec){
@@ -1286,6 +1291,7 @@ function saveSection(sec){
   if(sec==='info'){
     if(!myProfile.birthChanged && birthDraft!==myProfile.birth)myProfile.birthChanged=true;
     if(!myProfile.genderChanged && genderDraft!==myProfile.gender)myProfile.genderChanged=true;
+    if(countryDraft!==myProfile.country)myProfile.countryChangedAt=new Date().toISOString();
     myProfile.birth=birthDraft;myProfile.gender=genderDraft;myProfile.languages=[...langDraft];myProfile.country=countryDraft;
   }
   if(sec==='match')myProfile.match={...matchDraft};
@@ -1537,7 +1543,7 @@ function refreshProfileViews(){
   if(s&&s.classList.contains('on'))renderSignup();
 }
 function openSignup(){
-  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';myProfile.birthChanged=false;myProfile.genderChanged=false;
+  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';myProfile.birthChanged=false;myProfile.genderChanged=false;myProfile.countryChangedAt=null;
   signupStep=0;
   document.getElementById('signup').classList.add('on');
   renderSignup();
