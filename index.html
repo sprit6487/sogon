@@ -1361,8 +1361,7 @@ function resetProfile(){
 /* login / logout */
 function doLogin(provider){
   document.getElementById('login').classList.add('hide');
-  toast(provider+' 계정으로 로그인했어요');
-  if(profileComplete()){go('discover');}
+  if(profileComplete()){toast(provider+' 계정으로 로그인했어요');go('discover');}
   else{openSignup();}
 }
 function logout(){
