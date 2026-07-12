@@ -1250,6 +1250,7 @@ function renderMatchPanel(){
 }
 function saveMatchPanel(){
   myProfile.match={...matchDraft};saveProfileLS();
+  renderProfile();
   document.getElementById('matchPanel').classList.remove('on');
   toast('✅ 매칭 설정을 저장했어요');
 }
