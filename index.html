@@ -324,6 +324,10 @@
   .searchbar input{flex:1;border:none;outline:none;font-size:14px;background:#f1eef2;padding:9px 12px;border-radius:10px;}
   .searchbar .scount{font-size:12px;color:var(--sub);white-space:nowrap;}
   .searchbar .sx{font-size:18px;color:var(--sub);cursor:pointer;}
+  .searchbar .snav-btn{display:none;color:var(--main);cursor:pointer;padding:2px;align-items:center;}
+  .searchbar.has-matches .snav-btn{display:flex;}
+  .searchbar .snav-btn svg{width:19px;height:19px;}
+  .searchbar .scount{min-width:34px;text-align:right;}
 
   .msgs{flex:1;overflow-y:auto;padding:16px 12px 8px;display:flex;flex-direction:column;gap:3px;}
   .daysep{align-self:center;background:rgba(0,0,0,.08);color:#6a626f;font-size:11px;padding:4px 12px;border-radius:20px;margin:8px 0;}
@@ -342,6 +346,7 @@
   .msg.me .bubble .reply-btn{left:-26px;}
   .msg:hover .reply-btn{opacity:1;}
   mark{background:var(--acc);color:#3a2a08;border-radius:3px;padding:0 1px;}
+  .msg.cur-match .bubble{box-shadow:0 0 0 2.5px var(--acc);}
   .msg.dim{opacity:.32;}
 
   /* attachment bubbles */
@@ -475,6 +480,8 @@
       <div class="searchbar" id="searchbar">
         <input id="searchInput" placeholder="대화 내용 검색" oninput="runSearch(this.value)">
         <span class="scount" id="scount"></span>
+        <span class="snav-btn" onclick="searchNav(-1)" title="이전(과거) 결과"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 15 12 9 18 15"/></svg></span>
+        <span class="snav-btn" onclick="searchNav(1)" title="다음(최근) 결과"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></span>
         <span class="sx" onclick="toggleSearch()">✕</span>
       </div>
       <div class="msgs" id="msgs"></div>
@@ -1026,29 +1033,55 @@ function eulReul(word){
   return ((c-0xAC00)%28!==0)?'을':'를';
 }
 
+let matchEls=[], matchPos=-1;
 function renderMsgs(q){
-  const box=document.getElementById('msgs');box.innerHTML='';let hits=0;
+  const box=document.getElementById('msgs');box.innerHTML='';
+  const searching=!!(q&&q.trim());
+  matchEls=[];
   curRoom.msgs.forEach((m,i)=>{
     if(m.sep){const d=document.createElement('div');d.className='daysep';d.textContent=m.sep;box.appendChild(d);return;}
     const wrap=document.createElement('div');wrap.className='msg '+(m.me?'me':'you');
-    let body='';
+    let body='', isMatch=false;
     if(m.reply)body+=`<div class="quote"><b>${m.reply.n}</b>${esc(m.reply.t)}</div>`;
-    if(m.att){body+=attHTML(m.att);if(q&&q.trim())wrap.classList.add('dim');}
+    if(m.att){body+=attHTML(m.att);}
     else{
       let txt=esc(m.t);
-      if(q&&q.trim()){
+      if(searching){
         const re=new RegExp('('+esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
-        if(re.test(txt)){txt=txt.replace(re,'<mark>$1</mark>');hits++;}
-        else wrap.classList.add('dim');
+        if(re.test(txt)){txt=txt.replace(re,'<mark>$1</mark>');isMatch=true;}
       }
       body+=txt;
     }
+    if(searching&&!isMatch)wrap.classList.add('dim');
     const rb=`<span class="reply-btn" onclick="startReply(${i})">↩</span>`;
     wrap.innerHTML=`<div class="bubble">${body}${rb}</div><div class="time">${m.time||''}</div>`;
     box.appendChild(wrap);
+    if(searching&&isMatch)matchEls.push(wrap);
   });
-  box.scrollTop=box.scrollHeight;
-  if(q!==undefined){const sc=document.getElementById('scount');sc.textContent=q.trim()?(hits+'건'):'';}
+  if(searching){
+    matchPos=matchEls.length-1;   // 가장 최근 매칭부터
+    focusMatch();
+  }else{
+    matchEls=[];matchPos=-1;
+    box.scrollTop=box.scrollHeight;
+    const sc=document.getElementById('scount');if(sc)sc.textContent='';
+    document.getElementById('searchbar').classList.remove('has-matches');
+  }
+}
+function focusMatch(){
+  matchEls.forEach(el=>el.classList.remove('cur-match'));
+  const sb=document.getElementById('searchbar'), sc=document.getElementById('scount');
+  if(!matchEls.length){sc.textContent='결과 없음';sb.classList.remove('has-matches');return;}
+  sb.classList.add('has-matches');
+  const el=matchEls[matchPos];
+  el.classList.add('cur-match');
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  sc.textContent=(matchEls.length-matchPos)+'/'+matchEls.length;
+}
+function searchNav(step){
+  if(!matchEls.length)return;
+  matchPos=Math.max(0,Math.min(matchEls.length-1,matchPos+step));
+  focusMatch();
 }
 
 function startReply(i){
