@@ -223,6 +223,10 @@
   .info-input{border:none;outline:none;text-align:right;font-size:13.5px;font-weight:600;color:var(--ink);background:#f4f1f4;border-radius:9px;padding:7px 11px;max-width:62%;font-family:inherit;}
   .info-input:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--main);}
   .info-row .locked{font-size:11px;color:#b6b0bb;font-style:normal;font-weight:500;margin-left:7px;}
+  .gender-mini{display:flex;gap:6px;}
+  .gender-mini .gm{font-size:13px;padding:6px 13px;border-radius:10px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;}
+  .gender-mini .gm.sel{border-color:var(--main);background:#fce7ec;color:var(--main);font-weight:700;}
+  .edit-hint{font-size:11.5px;color:var(--sub);text-align:right;padding:6px 0 2px;}
   .interest-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14.5px;font-family:inherit;outline:none;margin-bottom:14px;}
   .interest-input:focus{border-color:var(--main);}
   .date-input{font-family:inherit;text-align:right;}
@@ -1169,9 +1173,9 @@ let myProfile={
   photos:[],
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
-  birth:'1983-05-12', gender:'남성', languages:['한국어','English']
+  birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false
 };
-let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='';
+let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='';
 /* 생년월일 → 만 나이(국제 통용) */
 function calcAge(birth){
   if(!birth)return '-';
@@ -1219,10 +1223,19 @@ function renderProfile(){
     <div class="pf-sec">
       <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleSection('info')">${editSection==='info'?'완료':'편집'}</span></div>
       ${editSection==='info'
-        ? `<div class="info-row edit lang-row" onclick="openBirthPicker('edit')"><span>생년월일</span><b class="lang-field">${birthDraft?fmtBirth(birthDraft):'선택'} <span class="caret">▾</span></b></div>
-           <div class="info-row"><span>나이</span><b id="agePreview">${calcAge(birthDraft)}세</b></div>`
+        ? (m.birthChanged
+            ? `<div class="info-row"><span>생년월일</span><b>${fmtBirth(m.birth)}<em class="locked">변경 완료</em></b></div>
+               <div class="info-row"><span>나이</span><b>${calcAge(m.birth)}세</b></div>`
+            : `<div class="info-row edit lang-row" onclick="openBirthPicker('edit')"><span>생년월일</span><b class="lang-field">${birthDraft?fmtBirth(birthDraft):'선택'} <span class="caret">▾</span></b></div>
+               <div class="info-row"><span>나이</span><b id="agePreview">${calcAge(birthDraft)}세</b></div>
+               <div class="edit-hint">생년월일은 1회만 변경할 수 있어요</div>`)
         : `<div class="info-row"><span>나이</span><b>${calcAge(m.birth)}세</b></div>`}
-      <div class="info-row"><span>성별</span><b>${m.gender}${editSection==='info'?'<em class="locked">변경 불가</em>':''}</b></div>
+      ${editSection==='info'
+        ? (m.genderChanged
+            ? `<div class="info-row"><span>성별</span><b>${m.gender}<em class="locked">변경 완료</em></b></div>`
+            : `<div class="info-row edit"><span>성별</span><div class="gender-mini"><span class="gm ${genderDraft==='남성'?'sel':''}" onclick="genderDraft='남성';renderProfile()">남성</span><span class="gm ${genderDraft==='여성'?'sel':''}" onclick="genderDraft='여성';renderProfile()">여성</span></div></div>
+               <div class="edit-hint">성별은 1회만 변경할 수 있어요</div>`)
+        : `<div class="info-row"><span>성별</span><b>${m.gender}</b></div>`}
       ${editSection==='info'
         ? `<div class="info-row edit lang-row" onclick="openCountryPicker()"><span>국적</span><b class="lang-field">${countryDraft||'선택'} <span class="caret">▾</span></b></div>`
         : `<div class="info-row"><span>국적</span><b>${m.country}</b></div>`}
@@ -1239,12 +1252,16 @@ function toggleSection(sec){
   if(editSection)saveSection(editSection);
   editSection=sec;
   if(sec==='about')aboutDraft=myProfile.about;
-  if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];countryDraft=myProfile.country;}
+  if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];countryDraft=myProfile.country;genderDraft=myProfile.gender;}
   renderProfile();
 }
 function saveSection(sec){
   if(sec==='about'){if(aboutDraft)myProfile.about=aboutDraft;}
-  if(sec==='info'){myProfile.birth=birthDraft;myProfile.languages=[...langDraft];myProfile.country=countryDraft;}
+  if(sec==='info'){
+    if(!myProfile.birthChanged && birthDraft!==myProfile.birth)myProfile.birthChanged=true;
+    if(!myProfile.genderChanged && genderDraft!==myProfile.gender)myProfile.genderChanged=true;
+    myProfile.birth=birthDraft;myProfile.gender=genderDraft;myProfile.languages=[...langDraft];myProfile.country=countryDraft;
+  }
   saveProfileLS();
   if(sec!=='interests')toast('✅ 저장했어요');
 }
@@ -1474,7 +1491,7 @@ function refreshProfileViews(){
   if(s&&s.classList.contains('on'))renderSignup();
 }
 function openSignup(){
-  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';
+  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';myProfile.birthChanged=false;myProfile.genderChanged=false;
   signupStep=0;
   document.getElementById('signup').classList.add('on');
   renderSignup();
@@ -1501,6 +1518,7 @@ function renderSignup(){
     </div>`;
   }else if(st===1){
     content=`
+      <p class="sg-hint" style="margin:-10px 0 18px">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p>
       <div class="sg-field"><label>생년월일</label>
         <div class="sg-input sg-datebtn${m.birth?'':' ph'}" onclick="openBirthPicker('signup')"><span>${m.birth?fmtBirth(m.birth):'생년월일을 선택하세요'}</span><span class="cal-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div></div>
       ${m.birth?`<div class="sg-age">만 ${calcAge(m.birth)}세</div>`:''}
@@ -1509,7 +1527,7 @@ function renderSignup(){
           <div class="sg-gopt ${m.gender==='남성'?'sel':''}" onclick="myProfile.gender='남성';renderSignup()">남성</div>
           <div class="sg-gopt ${m.gender==='여성'?'sel':''}" onclick="myProfile.gender='여성';renderSignup()">여성</div>
         </div>
-        <p class="sg-hint">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p></div>`;
+        </div>`;
   }else if(st===2){
     content=`<div class="lang-list sg-list">
       ${COUNTRIES.map(c=>`<div class="lang-opt ${m.country===c?'sel':''}" onclick="myProfile.country='${c}';renderSignup()"><span>${c}</span><span class="lchk">${m.country===c?'✓':''}</span></div>`).join('')}
