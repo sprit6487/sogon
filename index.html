@@ -248,8 +248,10 @@
   .cal-nav.dis{color:#d8d3da;cursor:default;}
   .cal-nav.hidden{visibility:hidden;}
   .cal-title{display:flex;gap:8px;align-items:center;}
-  .cal-title .cal-part{font-size:16px;font-weight:800;cursor:pointer;padding:3px 8px;border-radius:8px;}
+  .cal-title .cal-part{font-size:16px;font-weight:800;cursor:pointer;padding:5px 11px;border-radius:9px;background:#f3eef1;display:inline-flex;align-items:center;gap:5px;}
+  .cal-title .cal-part .cc{font-size:10px;font-weight:400;font-style:normal;color:var(--sub);transition:transform .15s;}
   .cal-title .cal-part.active{background:#fce7ec;color:var(--main);}
+  .cal-title .cal-part.active .cc{color:var(--main);transform:rotate(180deg);}
   .month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:6px 0 4px;}
   .month-opt{text-align:center;padding:14px 0;font-size:14px;border-radius:12px;cursor:pointer;background:#f6f4f6;color:var(--ink);}
   .month-opt.sel{background:var(--main);color:#fff;font-weight:700;}
@@ -1344,8 +1346,8 @@ function renderBirthCal(){
     <div class="cal-head">
       <span class="cal-nav ${pickMode?'hidden':''}" onclick="${pickMode?'':'calMove(-1)'}">‹</span>
       <span class="cal-title">
-        <span class="cal-part${pickMode==='year'?' active':''}" onclick="birthMode('year')">${y}년</span>
-        <span class="cal-part${pickMode==='month'?' active':''}" onclick="birthMode('month')">${m+1}월</span>
+        <span class="cal-part${pickMode==='year'?' active':''}" onclick="birthMode('year')">${y}년 <i class="cc">▾</i></span>
+        <span class="cal-part${pickMode==='month'?' active':''}" onclick="birthMode('month')">${m+1}월 <i class="cc">▾</i></span>
       </span>
       <span class="cal-nav ${pickMode?'hidden':(canNext?'':'dis')}" onclick="${(!pickMode&&canNext)?'calMove(1)':''}">›</span>
     </div>
