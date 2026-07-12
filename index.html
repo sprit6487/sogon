@@ -261,6 +261,39 @@
   .set-withdraw{text-align:center;margin-top:16px;}
   .set-withdraw span{font-size:12.5px;color:#b6b0bb;cursor:pointer;text-decoration:underline;}
 
+  /* ---------- SIGNUP ---------- */
+  #signup{position:absolute;inset:0;z-index:46;background:var(--bg);display:none;flex-direction:column;}
+  #signup.on{display:flex;}
+  .sg-top{flex:0 0 auto;padding:40px 20px 14px;background:#fff;border-bottom:1px solid var(--line);}
+  .sg-progress{display:flex;gap:5px;}
+  .sg-progress span{flex:1;height:4px;border-radius:3px;background:#ece9ee;}
+  .sg-progress span.on{background:var(--main);}
+  .sg-step{font-size:11px;color:var(--sub);text-align:right;margin-top:8px;}
+  .sg-body{flex:1;overflow-y:auto;padding:22px 20px 20px;}
+  .sg-title{font-size:21px;font-weight:800;letter-spacing:-0.01em;}
+  .sg-sub{font-size:13px;color:var(--sub);margin:6px 0 20px;}
+  .sg-foot{flex:0 0 auto;display:flex;gap:10px;padding:12px 18px 20px;background:#fff;border-top:1px solid var(--line);}
+  .sg-btn{flex:1;padding:15px;border-radius:14px;font-size:15px;font-weight:700;border:none;cursor:pointer;}
+  .sg-btn.prev{flex:0 0 auto;padding:15px 22px;background:#f0eef1;color:#6a626f;}
+  .sg-btn.next{background:var(--main);color:#fff;}
+  .sg-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .sg-thumb{aspect-ratio:3/4;border-radius:14px;position:relative;box-shadow:0 3px 9px rgba(0,0,0,.08);}
+  .sg-thumb.add{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--main);background:#fff;border:2px dashed var(--light);cursor:pointer;box-shadow:none;}
+  .sg-thumb .sg-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e0566e;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .sg-hint{font-size:12px;color:var(--sub);margin-top:14px;}
+  .sg-field{margin-bottom:20px;}
+  .sg-field label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+  .sg-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:15px;font-family:inherit;outline:none;}
+  .sg-input:focus{border-color:var(--main);}
+  .sg-age{font-size:14px;color:var(--main);font-weight:700;margin:-10px 0 20px;}
+  .sg-gender{display:flex;gap:10px;}
+  .sg-gopt{flex:1;text-align:center;padding:14px;border-radius:12px;border:1.5px solid var(--line);font-size:15px;font-weight:600;cursor:pointer;color:#6a626f;}
+  .sg-gopt.sel{border-color:var(--main);background:#fce7ec;color:var(--main);}
+  .sg-list{max-height:none;}
+  .sg-textarea{width:100%;min-height:150px;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14px;line-height:1.6;font-family:inherit;resize:vertical;outline:none;}
+  .sg-textarea:focus{border-color:var(--main);}
+  .sg-ints{margin-top:2px;}
+
   /* ---------- CHAT LIST ---------- */
   #chats{background:#fff;}
   .clist{flex:1;overflow-y:auto;}
@@ -520,6 +553,9 @@
 
       </div>
     </div>
+
+    <!-- ============ SIGNUP ============ -->
+    <div id="signup"></div>
 
     <!-- request modal -->
     <div class="modal" id="modal"><div class="msheet" id="msheet"></div></div>
@@ -1199,10 +1235,10 @@ function submitInterest(){
   if(!v){toast('관심사를 입력해주세요');inp.focus();return;}
   if(myProfile.interests.length>=10){toast('관심사는 최대 10개까지 등록할 수 있어요');closeInterestModal();return;}
   if(myProfile.interests.includes(v)){toast('이미 등록된 관심사예요');inp.focus();return;}
-  myProfile.interests.push(v);saveProfileLS();closeInterestModal();renderProfile();
+  myProfile.interests.push(v);saveProfileLS();closeInterestModal();refreshProfileViews();
 }
 document.getElementById('interestModal').addEventListener('click',e=>{if(e.target.id==='interestModal')closeInterestModal();});
-function delInterest(i){myProfile.interests.splice(i,1);saveProfileLS();renderProfile();}
+function delInterest(i){myProfile.interests.splice(i,1);saveProfileLS();refreshProfileViews();}
 function addPhoto(){
   if(myProfile.photos.length>=10){toast('사진은 최대 10장까지 등록할 수 있어요');return;}
   document.getElementById('photoInput').click();
@@ -1256,7 +1292,7 @@ document.getElementById('photoInput').addEventListener('change',function(e){
   let pending=files.length;
   files.forEach(file=>processImage(file,dataUrl=>{
     myProfile.photos.push(`url('${dataUrl}') center/cover no-repeat`);
-    renderProfile();
+    refreshProfileViews();
     if(--pending===0)saveProfileLS();
   }));
   if(files.length)toast(over?'최대 10장까지만 등록돼요':files.length+'장을 추가했어요');
@@ -1281,11 +1317,113 @@ function closeSettings(){document.getElementById('settings').classList.remove('o
 /* login / logout */
 function doLogin(provider){
   document.getElementById('login').classList.add('hide');
-  go('discover');
   toast(provider+' 계정으로 로그인했어요');
+  if(profileComplete()){go('discover');}
+  else{setTimeout(openSignup,300);}
 }
 function logout(){
   document.getElementById('login').classList.remove('hide');
+}
+function profileComplete(){const m=myProfile;return m.photos.length>=1 && !!m.birth && !!m.gender && !!m.country && m.languages.length>=1;}
+
+/* ============ SIGNUP (회원가입 온보딩) ============ */
+let signupStep=0;
+function refreshProfileViews(){
+  renderProfile();
+  const s=document.getElementById('signup');
+  if(s&&s.classList.contains('on'))renderSignup();
+}
+function openSignup(){
+  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';
+  signupStep=0;
+  document.getElementById('signup').classList.add('on');
+  renderSignup();
+}
+const SG_TITLES=[
+  ['프로필 사진','얼굴이 잘 보이는 사진을 등록해주세요 · 필수'],
+  ['나이와 성별','생년월일로 나이가 자동 계산돼요 · 필수'],
+  ['국적','어느 나라 사람인지 알려주세요 · 필수'],
+  ['사용 언어','가능한 언어를 최대 3개 선택하세요 · 필수'],
+  ['관심사','나를 표현하는 관심사를 추가해보세요 · 선택'],
+  ['자기소개','자유롭게 나를 소개해보세요 · 선택'],
+];
+function renderSignup(){
+  const m=myProfile, st=signupStep;
+  const _pb=document.querySelector('.sg-body');const _sc=_pb?_pb.scrollTop:0;
+  const d18=new Date();d18.setFullYear(d18.getFullYear()-18);const maxBirth=d18.toISOString().slice(0,10);
+  let content='';
+  if(st===0){
+    content=`<div class="sg-photos">
+      ${m.photos.map((p,i)=>`<div class="sg-thumb" style="background:${p}"><span class="sg-del" onclick="sgDelPhoto(${i})">✕</span>${i===0?'<span class="main-badge">대표</span>':''}</div>`).join('')}
+      ${m.photos.length<10?`<div class="sg-thumb add" onclick="addPhoto()">＋</div>`:''}
+    </div>
+    <p class="sg-hint">첫 번째 사진이 대표 사진이 돼요 · 최대 10장</p>`;
+  }else if(st===1){
+    content=`
+      <div class="sg-field"><label>생년월일</label>
+        <input type="date" class="sg-input" value="${m.birth}" max="${maxBirth}" onchange="myProfile.birth=this.value;renderSignup()"></div>
+      ${m.birth?`<div class="sg-age">만 ${calcAge(m.birth)}세</div>`:''}
+      <div class="sg-field"><label>성별</label>
+        <div class="sg-gender">
+          <div class="sg-gopt ${m.gender==='남성'?'sel':''}" onclick="myProfile.gender='남성';renderSignup()">남성</div>
+          <div class="sg-gopt ${m.gender==='여성'?'sel':''}" onclick="myProfile.gender='여성';renderSignup()">여성</div>
+        </div>
+        <p class="sg-hint">성별은 가입 후 변경할 수 없어요</p></div>`;
+  }else if(st===2){
+    content=`<div class="lang-list sg-list">
+      ${COUNTRIES.map(c=>`<div class="lang-opt ${m.country===c?'sel':''}" onclick="myProfile.country='${c}';renderSignup()"><span>${c}</span><span class="lchk">${m.country===c?'✓':''}</span></div>`).join('')}
+    </div>`;
+  }else if(st===3){
+    content=`<div class="lang-list sg-list">
+      ${LANGS.map(l=>`<div class="lang-opt ${m.languages.includes(l)?'sel':''}" onclick="sgToggleLang('${l}')"><span>${l}</span><span class="lchk">${m.languages.includes(l)?'✓':''}</span></div>`).join('')}
+    </div>
+    <p class="sg-hint">${m.languages.length}/3 선택됨</p>`;
+  }else if(st===4){
+    content=`<div class="ints editing sg-ints">
+      ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
+      ${m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
+    </div>`;
+  }else{
+    content=`<textarea class="sg-textarea" placeholder="예: 여유로운 주말을 좋아하고 새로운 문화와 사람에 관심이 많아요." oninput="myProfile.about=this.value">${esc(m.about)}</textarea>`;
+  }
+  document.getElementById('signup').innerHTML=`
+    <div class="sg-top">
+      <div class="sg-progress">${Array.from({length:6},(_,i)=>`<span class="${i<=st?'on':''}"></span>`).join('')}</div>
+      <div class="sg-step">${st+1} / 6</div>
+    </div>
+    <div class="sg-body">
+      <h2 class="sg-title">${SG_TITLES[st][0]}</h2>
+      <p class="sg-sub">${SG_TITLES[st][1]}</p>
+      ${content}
+    </div>
+    <div class="sg-foot">
+      ${st>0?`<button class="sg-btn prev" onclick="sgPrev()">이전</button>`:''}
+      <button class="sg-btn next" onclick="sgNext()">${st<5?'다음':'소곤 시작하기'}</button>
+    </div>`;
+  const _nb=document.querySelector('.sg-body');if(_nb)_nb.scrollTop=_sc;
+}
+function sgDelPhoto(i){myProfile.photos.splice(i,1);renderSignup();}
+function sgToggleLang(l){
+  const i=myProfile.languages.indexOf(l);
+  if(i>=0)myProfile.languages.splice(i,1);
+  else{if(myProfile.languages.length>=3){toast('언어는 최대 3개까지 선택할 수 있어요');return;}myProfile.languages.push(l);}
+  renderSignup();
+}
+function sgPrev(){if(signupStep>0){signupStep--;renderSignup();}}
+function sgNext(){
+  const m=myProfile, st=signupStep;
+  if(st===0&&m.photos.length<1){toast('사진을 최소 1장 등록해주세요');return;}
+  if(st===1&&(!m.birth||!m.gender)){toast('생년월일과 성별을 입력해주세요');return;}
+  if(st===2&&!m.country){toast('국적을 선택해주세요');return;}
+  if(st===3&&m.languages.length<1){toast('사용 언어를 선택해주세요');return;}
+  if(st<5){signupStep++;renderSignup();const b=document.querySelector('.sg-body');if(b)b.scrollTop=0;}
+  else sgFinish();
+}
+function sgFinish(){
+  saveProfileLS();
+  document.getElementById('signup').classList.remove('on');
+  go('discover');
+  toast('🎉 가입 완료! 소곤에 오신 걸 환영해요');
 }
 
 /* init */
