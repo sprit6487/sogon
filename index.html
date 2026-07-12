@@ -120,6 +120,27 @@
   .travel-banner{display:none;align-items:center;justify-content:center;gap:6px;background:#fdeef2;color:var(--main);font-size:12px;font-weight:600;padding:9px 14px;flex:0 0 auto;}
   .travel-banner b{font-weight:800;}
   .travel-banner .tb-off{margin-left:6px;color:var(--sub);text-decoration:underline;cursor:pointer;font-weight:500;}
+  /* 다이아몬드 카드 + 상점 */
+  .dia-card{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,#fff 0%,#fdeff3 100%);border:1px solid #f0dce3;margin:12px 14px;border-radius:18px;padding:15px 16px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.05);}
+  .dia-left{display:flex;align-items:center;gap:12px;}
+  .dia-ico{font-size:22px;}
+  .dia-count{font-size:18px;font-weight:800;color:var(--ink);}
+  .dia-sub{font-size:11.5px;color:var(--sub);margin-top:1px;}
+  .dia-store{font-size:13.5px;font-weight:700;color:var(--main);white-space:nowrap;}
+  #store{position:absolute;inset:0;z-index:49;background:var(--bg);display:none;flex-direction:column;}
+  #store.on{display:flex;}
+  .store-body{flex:1;overflow-y:auto;padding:16px 18px 26px;}
+  .store-balance{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:16px;}
+  .store-balance b{color:var(--main);}
+  .bundle-list{display:flex;flex-direction:column;gap:10px;}
+  .bundle{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;}
+  .bd-left{display:flex;align-items:center;gap:12px;}
+  .bd-ico{font-size:22px;}
+  .bd-amt{font-size:15px;font-weight:800;color:var(--ink);}
+  .bd-bonus{font-size:11px;font-weight:700;color:#fff;background:var(--main);padding:2px 7px;border-radius:20px;margin-left:4px;}
+  .bd-base{font-size:11.5px;color:var(--sub);margin-top:2px;}
+  .bd-buy{background:var(--main);color:#fff;font-size:14px;font-weight:700;border:none;border-radius:12px;padding:10px 16px;cursor:pointer;white-space:nowrap;}
+  .store-note{font-size:11px;color:var(--sub);text-align:center;margin-top:16px;line-height:1.5;}
 
   .view{flex:1 1 auto;position:relative;overflow:hidden;display:none;}
   .view.on{display:flex;flex-direction:column;}
@@ -672,6 +693,12 @@
     <div id="travelMap">
       <div class="set-head"><span class="bk" onclick="closeTravelMap()">‹</span><b>여행 친구 찾기 💎</b></div>
       <div class="tm-body" id="travelMapBody"></div>
+    </div>
+
+    <!-- ============ STORE ============ -->
+    <div id="store">
+      <div class="set-head"><span class="bk" onclick="closeStore()">‹</span><b>다이아몬드 상점</b></div>
+      <div class="store-body" id="storeBody"></div>
     </div>
 
     <!-- ============ SIGNUP ============ -->
@@ -1258,7 +1285,7 @@ let myProfile={
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false,
-  match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null, travelLocation:null
+  match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null, travelLocation:null, diamonds:12
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
 function matchControlsHTML(){
@@ -1308,6 +1335,29 @@ function saveMatchPanel(){
   toast('✅ 매칭 설정을 저장했어요');
 }
 function closeMatchPanel(){document.getElementById('matchPanel').classList.remove('on');}
+
+/* 다이아몬드 상점 */
+const DIA_BUNDLES=[{amt:10,bonus:0,price:1200},{amt:30,bonus:3,price:3300},{amt:60,bonus:8,price:6000},{amt:120,bonus:22,price:11000},{amt:300,bonus:70,price:25000},{amt:600,bonus:180,price:47000}];
+function won(n){return n.toLocaleString('ko-KR');}
+function openStore(){renderStore();document.getElementById('store').classList.add('on');}
+function closeStore(){document.getElementById('store').classList.remove('on');}
+function renderStore(){
+  document.getElementById('storeBody').innerHTML=`
+    <div class="store-balance"><span class="dia-ico">💎</span> 현재 보유 <b>${myProfile.diamonds}개</b></div>
+    <div class="bundle-list">
+      ${DIA_BUNDLES.map((b,i)=>`<div class="bundle">
+        <div class="bd-left"><span class="bd-ico">💎</span><div><div class="bd-amt">${b.amt+b.bonus}개${b.bonus?` <span class="bd-bonus">+${b.bonus} 보너스</span>`:''}</div>${b.bonus?`<div class="bd-base">${b.amt}개 + ${b.bonus}개</div>`:''}</div></div>
+        <button class="bd-buy" onclick="buyDiamonds(${i})">₩${won(b.price)}</button>
+      </div>`).join('')}
+    </div>
+    <p class="store-note">※ 목업 화면입니다. 실제 결제는 앱스토어·구글 인앱결제로 진행됩니다.</p>`;
+}
+function buyDiamonds(i){
+  const b=DIA_BUNDLES[i];const total=b.amt+b.bonus;
+  myProfile.diamonds+=total;saveProfileLS();
+  renderStore();renderProfile();
+  toast('💎 '+total+'개를 충전했어요');
+}
 
 /* 여행 친구 찾기 (위치 변경) */
 const PIN_SVG='<svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7z" fill="#DB6A85" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="9" r="2.7" fill="#fff"/></svg>';
@@ -1408,6 +1458,11 @@ function renderProfile(){
       ${m.photos.map((p,i)=>`<div class="pf-thumb" style="background:${p}" onclick="openPhotoMenu(${i})">
           ${i===0?'<span class="main-badge">대표</span>':''}</div>`).join('')}
       ${m.photos.length<10?`<div class="pf-thumb add" onclick="addPhoto()">＋</div>`:''}
+    </div>
+
+    <div class="dia-card" onclick="openStore()">
+      <div class="dia-left"><span class="dia-ico">💎</span><div><div class="dia-count">${myProfile.diamonds}개</div><div class="dia-sub">보유 다이아몬드</div></div></div>
+      <div class="dia-store">상점 ›</div>
     </div>
 
     <div class="pf-sec">
