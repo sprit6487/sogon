@@ -1495,7 +1495,7 @@ function renderSignup(){
           <div class="sg-gopt ${m.gender==='남성'?'sel':''}" onclick="myProfile.gender='남성';renderSignup()">남성</div>
           <div class="sg-gopt ${m.gender==='여성'?'sel':''}" onclick="myProfile.gender='여성';renderSignup()">여성</div>
         </div>
-        <p class="sg-hint">성별은 가입 후 변경할 수 없어요</p></div>`;
+        <p class="sg-hint">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p></div>`;
   }else if(st===2){
     content=`<div class="lang-list sg-list">
       ${COUNTRIES.map(c=>`<div class="lang-opt ${m.country===c?'sel':''}" onclick="myProfile.country='${c}';renderSignup()"><span>${c}</span><span class="lchk">${m.country===c?'✓':''}</span></div>`).join('')}
