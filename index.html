@@ -904,6 +904,12 @@ function findMore(){
   renderDeck();
   toast('💎 새로운 인연 30명을 더 찾았어요');
 }
+function personLang(c){
+  const name=(c.split(' ')[1]||'');
+  const map={'미국':'English','영국':'English','캐나다':'English','호주':'English','뉴질랜드':'English','독일':'Deutsch','프랑스':'Français','스페인':'Español','이탈리아':'Italiano','네덜란드':'Nederlands','스웨덴':'Svenska','노르웨이':'Norsk','덴마크':'Dansk','핀란드':'Suomi','러시아':'Русский','일본':'日本語','중국':'中文','대만':'中文','홍콩':'中文','베트남':'Tiếng Việt','태국':'ไทย','필리핀':'Filipino','인도네시아':'Bahasa Indonesia','말레이시아':'Bahasa Melayu','인도':'हिन्दी','브라질':'Português','포르투갈':'Português','멕시코':'Español','아르헨티나':'Español','폴란드':'Polski','체코':'Čeština','그리스':'Ελληνικά','튀르키예':'Türkçe','루마니아':'Română'};
+  const native=map[name]||'English';
+  return native==='한국어'?'한국어':`${native}, 한국어`;
+}
 function renderDeck(){
   const deck=document.getElementById('deck'); deck.innerHTML='';
   const remaining=discoverPeople.slice(deckIdx);
@@ -925,8 +931,9 @@ function renderDeck(){
       <div class="stamp super">슈퍼라이크</div>
       <div class="stamp nope">PASS</div>
       <div class="pinfo">
-        <div class="pname">${p.n} <small>· ${p.a}</small></div>
-        <div class="pmeta">${p.c} · ${p.loc}</div>
+        <div class="pname">${p.n} <small>· ${p.a}세</small></div>
+        <div class="pmeta">${p.c} · 여성</div>
+        <div class="pmeta">🗣 ${personLang(p.c)}</div>
         <div class="ptags">${p.tags.map(t=>`<span class="ptag">${t}</span>`).join('')}</div>
       </div>
       <div class="sheet">
