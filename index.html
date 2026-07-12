@@ -308,6 +308,7 @@
   .sg-req{font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;background:#fce7ec;color:var(--main);letter-spacing:0;position:relative;top:1px;}
   .sg-req.opt{background:#f0eef1;color:#9a929f;}
   .sg-sub{font-size:13px;color:var(--sub);margin:6px 0 20px;}
+  .sg-sub .em,.sg-hint .em{color:var(--main);font-weight:700;}
   .sg-foot{flex:0 0 auto;display:flex;gap:10px;padding:12px 18px 20px;background:#fff;border-top:1px solid var(--line);}
   .sg-btn{flex:1;padding:15px;border-radius:14px;font-size:15px;font-weight:700;border:none;cursor:pointer;}
   .sg-btn.prev{flex:0 0 auto;padding:15px 22px;background:#f0eef1;color:#6a626f;}
@@ -1499,7 +1500,7 @@ function openSignup(){
   renderSignup();
 }
 const SG_TITLES=[
-  ['프로필 사진','얼굴이 잘 보이는 사진을 최소 1장 등록해주세요',true],
+  ['프로필 사진','얼굴이 잘 보이는 사진을 <span class="em">최소 1장</span> 등록해주세요',true],
   ['나이와 성별','생년월일로 나이가 자동 계산돼요',true],
   ['국적','어느 나라 사람인지 알려주세요',true],
   ['사용 언어','가능한 언어를 최대 3개 선택하세요',true],
@@ -1520,7 +1521,7 @@ function renderSignup(){
     </div>`;
   }else if(st===1){
     content=`
-      <p class="sg-hint" style="margin:-15px 0 18px;font-size:13px">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p>
+      <p class="sg-hint" style="margin:-15px 0 18px;font-size:13px">생년월일과 성별은 가입 후 <span class="em">딱 1번만</span> 변경할 수 있어요</p>
       <div class="sg-field"><label>생년월일</label>
         <div class="sg-input sg-datebtn${m.birth?'':' ph'}" onclick="openBirthPicker('signup')"><span>${m.birth?fmtBirth(m.birth):'생년월일을 선택하세요'}</span><span class="cal-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div></div>
       ${m.birth?`<div class="sg-age">만 ${calcAge(m.birth)}세</div>`:''}
