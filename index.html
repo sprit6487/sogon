@@ -1518,7 +1518,7 @@ function renderSignup(){
     </div>`;
   }else if(st===1){
     content=`
-      <p class="sg-hint" style="margin:-10px 0 18px">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p>
+      <p class="sg-hint" style="margin:-15px 0 18px;font-size:13px">생년월일과 성별은 가입 후 딱 1번만 변경할 수 있어요</p>
       <div class="sg-field"><label>생년월일</label>
         <div class="sg-input sg-datebtn${m.birth?'':' ph'}" onclick="openBirthPicker('signup')"><span>${m.birth?fmtBirth(m.birth):'생년월일을 선택하세요'}</span><span class="cal-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span></div></div>
       ${m.birth?`<div class="sg-age">만 ${calcAge(m.birth)}세</div>`:''}
