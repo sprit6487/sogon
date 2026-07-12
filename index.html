@@ -1192,7 +1192,7 @@ let myProfile={
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false,
-  match:{gender:'여성', ageMin:30, ageMax:45, distance:50}, countryChangedAt:null
+  match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
 function ageSlide(which){
@@ -1203,11 +1203,13 @@ function ageSlide(which){
   const f=document.getElementById('ageFill');if(f){f.style.left=l+'%';f.style.width=(r-l)+'%';}
   const lb=document.getElementById('ageLabel');if(lb)lb.textContent=mn+' ~ '+mx+'세';
 }
-function distSlide(){
-  const v=+document.getElementById('distR').value;
-  matchDraft.distance=v;
-  const f=document.getElementById('distFill');if(f)f.style.width=((v-10)/490*100)+'%';
-  const lb=document.getElementById('distLabel');if(lb)lb.textContent=v>=500?'제한 없음':v+'km 이내';
+function distSlide(which){
+  let mn=+document.getElementById('distMinR').value, mx=+document.getElementById('distMaxR').value;
+  if(mn>mx){if(which==='min'){mx=mn;document.getElementById('distMaxR').value=mx;}else{mn=mx;document.getElementById('distMinR').value=mn;}}
+  matchDraft.distMin=mn;matchDraft.distMax=mx;
+  const l=(mn-10)/490*100, r=(mx-10)/490*100;
+  const f=document.getElementById('distFill');if(f){f.style.left=l+'%';f.style.width=(r-l)+'%';}
+  const lb=document.getElementById('distLabel');if(lb)lb.textContent=mn+'km ~ '+(mx>=500?'제한없음':mx+'km');
 }
 function countryLocked(){if(!myProfile.countryChangedAt)return false;const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return new Date()<n;}
 function countryNextDate(){const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return `${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;}
@@ -1295,15 +1297,16 @@ function renderProfile(){
                <input type="range" id="ageMinR" min="19" max="65" value="${matchDraft.ageMin}" oninput="ageSlide('min')">
                <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
              </div></div>
-           <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distance>=500?'제한 없음':matchDraft.distance+'km 이내'}</b></div>
-             <div class="age-range single">
+           <div class="mr-field"><div class="mr-head">거리 <b id="distLabel">${matchDraft.distMin}km ~ ${matchDraft.distMax>=500?'제한없음':matchDraft.distMax+'km'}</b></div>
+             <div class="age-range">
                <div class="rail"></div>
-               <div class="fill" id="distFill" style="left:0;width:${(Math.max(10,matchDraft.distance)-10)/490*100}%"></div>
-               <input type="range" id="distR" min="10" max="500" step="10" value="${matchDraft.distance>=10?matchDraft.distance:500}" oninput="distSlide()">
+               <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/490*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/490*100}%"></div>
+               <input type="range" id="distMinR" min="10" max="500" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
+               <input type="range" id="distMaxR" min="10" max="500" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
              </div></div>`
         : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
            <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
-           <div class="info-row"><span>거리</span><b>${(!m.match.distance||m.match.distance>=500)?'제한 없음':m.match.distance+'km 이내'}</b></div>`}
+           <div class="info-row"><span>거리</span><b>${(m.match.distMin??10)}km ~ ${(m.match.distMax??100)>=500?'제한없음':(m.match.distMax??100)+'km'}</b></div>`}
     </div>
 
    </div>`;
@@ -1314,7 +1317,7 @@ function toggleSection(sec){
   editSection=sec;
   if(sec==='about')aboutDraft=myProfile.about;
   if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];countryDraft=myProfile.country;genderDraft=myProfile.gender;}
-  if(sec==='match')matchDraft={...myProfile.match};
+  if(sec==='match'){matchDraft={...myProfile.match};if(matchDraft.distMin==null)matchDraft.distMin=10;if(matchDraft.distMax==null)matchDraft.distMax=(matchDraft.distance>=10?matchDraft.distance:100);}
   renderProfile();
 }
 function saveSection(sec){
