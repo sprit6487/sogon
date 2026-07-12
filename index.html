@@ -227,6 +227,10 @@
   .gender-mini .gm{font-size:13px;padding:6px 13px;border-radius:10px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;}
   .gender-mini .gm.sel{border-color:var(--main);background:#fce7ec;color:var(--main);font-weight:700;}
   .edit-hint{font-size:11.5px;color:var(--sub);text-align:right;padding:6px 0 2px;}
+  .range-mini{display:flex;align-items:center;gap:6px;}
+  .range-mini select,.dist-sel{border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:13.5px;font-family:inherit;background:#f4f1f4;color:var(--ink);outline:none;cursor:pointer;}
+  .range-mini select:focus,.dist-sel:focus{border-color:var(--main);}
+  .range-mini span{font-size:13px;color:var(--sub);}
   .interest-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14.5px;font-family:inherit;outline:none;margin-bottom:14px;}
   .interest-input:focus{border-color:var(--main);}
   .date-input{font-family:inherit;text-align:right;}
@@ -586,12 +590,6 @@
           <div class="set-row nav" onclick="toast('신고 내역 화면은 준비 중이에요')"><span>내 신고 내역</span><span class="chev">›</span></div>
         </div>
 
-        <div class="set-group">
-          <div class="set-glabel">매칭 설정</div>
-          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>관심 성별</span><span class="set-val">여성 ›</span></div>
-          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>나이 범위</span><span class="set-val">30 – 45세 ›</span></div>
-          <div class="set-row nav" onclick="toast('매칭 설정 화면은 준비 중이에요')"><span>거리</span><span class="set-val">50km 이내 ›</span></div>
-        </div>
 
 
         <div class="set-group">
@@ -1183,9 +1181,11 @@ let myProfile={
   photos:[],
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
-  birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false
+  birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false,
+  match:{gender:'여성', ageMin:30, ageMax:45, distance:50}
 };
-let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='';
+let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
+function ageOpts(sel){let o='';for(let a=19;a<=65;a++)o+=`<option value="${a}"${a===sel?' selected':''}>${a}</option>`;return o;}
 /* 생년월일 → 만 나이(국제 통용) */
 function calcAge(birth){
   if(!birth)return '-';
@@ -1254,6 +1254,21 @@ function renderProfile(){
         : `<div class="info-row"><span>언어</span><b>${m.languages.join(', ')}</b></div>`}
     </div>
 
+    <div class="pf-sec">
+      <div class="sec-h"><b>매칭 설정</b><span class="ed" onclick="toggleSection('match')">${editSection==='match'?'완료':'편집'}</span></div>
+      ${editSection==='match'
+        ? `<div class="info-row edit"><span>관심 성별</span><div class="gender-mini">${['남성','여성','모두'].map(g=>`<span class="gm ${matchDraft.gender===g?'sel':''}" onclick="matchDraft.gender='${g}';renderProfile()">${g}</span>`).join('')}</div></div>
+           <div class="info-row edit"><span>나이 범위</span><div class="range-mini">
+             <select onchange="matchDraft.ageMin=+this.value;if(matchDraft.ageMax<matchDraft.ageMin)matchDraft.ageMax=matchDraft.ageMin;renderProfile()">${ageOpts(matchDraft.ageMin)}</select>
+             <span>~</span>
+             <select onchange="matchDraft.ageMax=+this.value;if(matchDraft.ageMin>matchDraft.ageMax)matchDraft.ageMin=matchDraft.ageMax;renderProfile()">${ageOpts(matchDraft.ageMax)}</select>
+             <span>세</span></div></div>
+           <div class="info-row edit"><span>거리</span><select class="dist-sel" onchange="matchDraft.distance=+this.value;renderProfile()">${[10,25,50,100,0].map(d=>`<option value="${d}"${d===matchDraft.distance?' selected':''}>${d===0?'제한 없음':d+'km 이내'}</option>`).join('')}</select></div>`
+        : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
+           <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
+           <div class="info-row"><span>거리</span><b>${m.match.distance===0?'제한 없음':m.match.distance+'km 이내'}</b></div>`}
+    </div>
+
     <div class="pf-logout"><button onclick="logout()">로그아웃</button></div>
    </div>`;
 }
@@ -1263,6 +1278,7 @@ function toggleSection(sec){
   editSection=sec;
   if(sec==='about')aboutDraft=myProfile.about;
   if(sec==='info'){birthDraft=myProfile.birth;langDraft=[...myProfile.languages];countryDraft=myProfile.country;genderDraft=myProfile.gender;}
+  if(sec==='match')matchDraft={...myProfile.match};
   renderProfile();
 }
 function saveSection(sec){
@@ -1272,6 +1288,7 @@ function saveSection(sec){
     if(!myProfile.genderChanged && genderDraft!==myProfile.gender)myProfile.genderChanged=true;
     myProfile.birth=birthDraft;myProfile.gender=genderDraft;myProfile.languages=[...langDraft];myProfile.country=countryDraft;
   }
+  if(sec==='match')myProfile.match={...matchDraft};
   saveProfileLS();
   if(sec!=='interests')toast('✅ 저장했어요');
 }
