@@ -1290,7 +1290,6 @@ function renderLangSheet(){
     <div class="mgrip"></div>
     <h2 style="font-size:17px;font-weight:800;padding:0 2px 4px">언어 선택</h2>
     <p style="font-size:12.5px;color:var(--sub);padding:0 2px 8px">최대 3개까지 선택할 수 있어요 (<span id="lpCount">${langDraft.length}</span>/3)</p>
-    <input class="cp-search" id="lpSearch" placeholder="언어 검색 (예: English, 中文)" oninput="lpFilter(this.value)">
     <div id="lpLangList" class="lang-list">${langOptsHTML('',langDraft,'toggleLang')}</div>
     <button class="mbtn yes" style="width:100%;margin-top:10px" onclick="closeLangPicker()">완료</button>`;
 }
@@ -1563,8 +1562,7 @@ function renderSignup(){
       <input class="cp-search" placeholder="국가 검색 (예: 한국, 미국)" oninput="sgFilterCountry(this.value)">
       <div id="sgCountryList" class="lang-list">${countryOptsHTML('',m.country,'sgPickCountry')}</div>`;
   }else if(st===3){
-    content=`<input class="cp-search" id="sgLangSearch" placeholder="언어 검색 (예: English, 中文)" oninput="sgFilterLang(this.value)">
-      <div id="sgLangList" class="lang-list">${langOptsHTML('',m.languages,'sgToggleLang')}</div>
+    content=`<div id="sgLangList" class="lang-list">${langOptsHTML('',m.languages,'sgToggleLang')}</div>
       <p class="sg-hint"><span id="sgLangCount">${m.languages.length}</span>/3 선택됨</p>`;
   }else if(st===4){
     content=`<div class="ints editing sg-ints">
