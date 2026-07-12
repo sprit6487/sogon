@@ -997,12 +997,12 @@ function renderMsgs(q){
     const wrap=document.createElement('div');wrap.className='msg '+(m.me?'me':'you');
     let body='';
     if(m.reply)body+=`<div class="quote"><b>${m.reply.n}</b>${esc(m.reply.t)}</div>`;
-    if(m.att){body+=attHTML(m.att);}
+    if(m.att){body+=attHTML(m.att);if(q&&q.trim())wrap.classList.add('dim');}
     else{
       let txt=esc(m.t);
       if(q&&q.trim()){
-        const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')',' gi');
-        if(re.test(m.t)){txt=txt.replace(re,'<mark>$1</mark>');hits++;}
+        const re=new RegExp('('+esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
+        if(re.test(txt)){txt=txt.replace(re,'<mark>$1</mark>');hits++;}
         else wrap.classList.add('dim');
       }
       body+=txt;
