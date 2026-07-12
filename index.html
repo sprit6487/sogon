@@ -242,10 +242,16 @@
   .cp-search{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;}
   .cp-search:focus{border-color:var(--main);}
   .no-result{text-align:center;color:var(--sub);font-size:13px;padding:26px 0;}
-  .cp-selected{display:flex;align-items:center;justify-content:space-between;background:#fdeff3;border:1.5px solid var(--main);border-radius:12px;padding:11px 14px;margin-bottom:12px;}
-  .cp-selected .cp-sel-label{font-size:12px;color:var(--main);font-weight:700;}
-  .cp-selected .cp-sel-val{font-size:15px;font-weight:800;color:var(--ink);}
-  .cp-nosel{font-size:12.5px;color:var(--sub);padding:0 2px 10px;}
+  .cp-selected{display:flex;align-items:center;justify-content:space-between;background:#f6f4f6;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;margin-bottom:12px;}
+  .cp-selected.has{background:#fdeff3;border-color:var(--main);}
+  .cp-selected .cp-sel-label{font-size:12px;color:var(--sub);font-weight:700;}
+  .cp-selected.has .cp-sel-label{color:var(--main);}
+  .cp-selected .cp-sel-val{font-size:15px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;}
+  .cp-selected:not(.has) .cp-sel-val{font-size:13.5px;font-weight:600;color:var(--sub);}
+  .flag-badge{display:inline-flex;align-items:center;justify-content:center;min-width:27px;padding:2px 6px;background:#eceaef;border-radius:6px;font-size:11.5px;font-weight:700;color:#6a626f;margin-right:9px;flex:0 0 auto;}
+  .cp-selected.has .flag-badge{background:#fff;}
+  .cty-name{vertical-align:middle;}
+  .lang-opt .cty{display:inline-flex;align-items:center;min-width:0;}
   /* birthdate calendar */
   .sg-datebtn{display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
   .sg-datebtn.ph>span:first-child{color:var(--sub);}
@@ -1300,19 +1306,20 @@ function closeLangPicker(){document.getElementById('langModal').classList.remove
 document.getElementById('langModal').addEventListener('click',e=>{if(e.target.id==='langModal')closeLangPicker();});
 /* 국적 단일 선택 (전세계 + 검색) */
 const COUNTRIES=['🇰🇷 한국','🇺🇸 미국','🇯🇵 일본','🇨🇳 중국','🇬🇧 영국','🇨🇦 캐나다','🇦🇺 호주','🇩🇪 독일','🇫🇷 프랑스','🇪🇸 스페인','🇮🇹 이탈리아','🇳🇱 네덜란드','🇹🇼 대만','🇭🇰 홍콩','🇻🇳 베트남','🇹🇭 태국','🇵🇭 필리핀','🇮🇩 인도네시아','🇲🇾 말레이시아','🇸🇬 싱가포르','🇮🇳 인도','🇳🇵 네팔','🇵🇰 파키스탄','🇧🇩 방글라데시','🇱🇰 스리랑카','🇲🇲 미얀마','🇰🇭 캄보디아','🇱🇦 라오스','🇲🇳 몽골','🇰🇿 카자흐스탄','🇺🇿 우즈베키스탄','🇹🇷 튀르키예','🇸🇦 사우디아라비아','🇦🇪 아랍에미리트','🇮🇱 이스라엘','🇮🇷 이란','🇮🇶 이라크','🇶🇦 카타르','🇰🇼 쿠웨이트','🇯🇴 요르단','🇱🇧 레바논','🇵🇹 포르투갈','🇧🇪 벨기에','🇨🇭 스위스','🇦🇹 오스트리아','🇸🇪 스웨덴','🇳🇴 노르웨이','🇩🇰 덴마크','🇫🇮 핀란드','🇮🇸 아이슬란드','🇮🇪 아일랜드','🇵🇱 폴란드','🇨🇿 체코','🇭🇺 헝가리','🇬🇷 그리스','🇷🇴 루마니아','🇧🇬 불가리아','🇭🇷 크로아티아','🇷🇸 세르비아','🇺🇦 우크라이나','🇷🇺 러시아','🇸🇰 슬로바키아','🇸🇮 슬로베니아','🇱🇹 리투아니아','🇱🇻 라트비아','🇪🇪 에스토니아','🇱🇺 룩셈부르크','🇲🇹 몰타','🇨🇾 키프로스','🇲🇽 멕시코','🇧🇷 브라질','🇦🇷 아르헨티나','🇨🇱 칠레','🇨🇴 콜롬비아','🇵🇪 페루','🇻🇪 베네수엘라','🇪🇨 에콰도르','🇺🇾 우루과이','🇵🇾 파라과이','🇧🇴 볼리비아','🇨🇺 쿠바','🇨🇷 코스타리카','🇵🇦 파나마','🇬🇹 과테말라','🇩🇴 도미니카공화국','🇳🇿 뉴질랜드','🇫🇯 피지','🇪🇬 이집트','🇿🇦 남아프리카공화국','🇳🇬 나이지리아','🇰🇪 케냐','🇲🇦 모로코','🇩🇿 알제리','🇹🇳 튀니지','🇬🇭 가나','🇪🇹 에티오피아','🇹🇿 탄자니아','🇺🇬 우간다'];
+function ctyHTML(c){const i=c.indexOf(' ');return `<span class="flag-badge">${c.slice(0,i)}</span><span class="cty-name">${c.slice(i+1)}</span>`;}
 function countryOptsHTML(q,selected,fn){
   const ql=(q||'').trim().toLowerCase();
   const list=COUNTRIES.filter(c=>!ql||c.toLowerCase().includes(ql));
   if(!list.length)return '<div class="no-result">검색 결과가 없어요</div>';
-  return list.map(c=>`<div class="lang-opt ${selected===c?'sel':''}" onclick="${fn}('${c}')"><span>${c}</span><span class="lchk">${selected===c?'✓':''}</span></div>`).join('');
+  return list.map(c=>`<div class="lang-opt ${selected===c?'sel':''}" onclick="${fn}('${c}')"><span class="cty">${ctyHTML(c)}</span><span class="lchk">${selected===c?'✓':''}</span></div>`).join('');
 }
-function selectedCountryHTML(c){return `<div class="cp-selected"><span class="cp-sel-label">선택한 국적</span><span class="cp-sel-val">${c}</span></div>`;}
+function selectedCountryHTML(c){return `<div class="cp-selected${c?' has':''}"><span class="cp-sel-label">선택한 국적</span><span class="cp-sel-val">${c?ctyHTML(c):'아직 선택 안 함'}</span></div>`;}
 function openCountryPicker(){renderCountrySheet();document.getElementById('countryModal').classList.add('on');}
 function renderCountrySheet(){
   document.getElementById('countrySheet').innerHTML=`
     <div class="mgrip"></div>
     <h2 style="font-size:17px;font-weight:800;padding:0 2px 4px">국적 선택</h2>
-    ${countryDraft?selectedCountryHTML(countryDraft):'<p class="cp-nosel">어느 나라 사람인지 선택해주세요</p>'}
+    ${selectedCountryHTML(countryDraft)}
     <input class="cp-search" placeholder="국가 검색 (예: 한국, 미국)" oninput="cpFilter(this.value)">
     <div id="cpCountryList" class="lang-list">${countryOptsHTML('',countryDraft,'pickCountry')}</div>
     <button class="mbtn yes" style="width:100%;margin-top:10px" onclick="closeCountryPicker()">완료</button>`;
@@ -1550,7 +1557,7 @@ function renderSignup(){
         </div>
         </div>`;
   }else if(st===2){
-    content=`${m.country?selectedCountryHTML(m.country):''}
+    content=`${selectedCountryHTML(m.country)}
       <input class="cp-search" placeholder="국가 검색 (예: 한국, 미국)" oninput="sgFilterCountry(this.value)">
       <div id="sgCountryList" class="lang-list">${countryOptsHTML('',m.country,'sgPickCountry')}</div>`;
   }else if(st===3){
