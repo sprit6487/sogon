@@ -104,8 +104,8 @@
   #travelMap.on{display:flex;}
   .tm-body{flex:1;display:flex;flex-direction:column;padding:16px 18px 22px;overflow-y:auto;}
   .tm-desc{font-size:12.5px;color:var(--sub);padding:2px 2px 12px;}
-  .city-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
-  .cchip{font-size:12.5px;padding:7px 12px;border-radius:20px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;background:#fff;}
+  .city-chips{display:flex;flex-wrap:nowrap;gap:7px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;}
+  .cchip{font-size:12.5px;padding:7px 12px;border-radius:20px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;background:#fff;white-space:nowrap;flex:0 0 auto;}
   .cchip:active{background:#f3eef1;}
   .map-area{position:relative;flex:1;min-height:240px;background:#e9eef0;border-radius:16px;overflow:hidden;cursor:crosshair;box-shadow:inset 0 0 0 1px #dfe6e8;}
   .map-area::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 38px,#dde5e7 38px 40px),repeating-linear-gradient(90deg,transparent 0 46px,#dde5e7 46px 48px);}
@@ -179,6 +179,8 @@
   .act.super{width:54px;height:54px;font-size:21px;position:relative;color:#fff;background:linear-gradient(150deg,#7db4e8,#5b8def);}
   .act .gem{position:absolute;top:-4px;right:-4px;font-size:14px;background:#fff;border-radius:50%;padding:1px;box-shadow:0 1px 4px rgba(0,0,0,.2);}
   .deck-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--sub);text-align:center;gap:8px;padding:30px;}
+  .find-more{margin-top:18px;padding:12px 20px;border-radius:22px;background:var(--main);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;box-shadow:0 6px 16px rgba(219,106,133,.35);display:inline-flex;align-items:center;gap:6px;}
+  .find-more .fm-gem{font-size:13px;}
 
   /* ---------- RECEIVED (grid) ---------- */
   #received{background:var(--bg);}
@@ -868,11 +870,18 @@ function go(v){
 
 /* ============ DISCOVER DECK ============ */
 let deckIdx=0;
+function findMore(){
+  const batch=discoverPeople.slice(0,30);
+  for(let i=batch.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[batch[i],batch[j]]=[batch[j],batch[i]];}
+  discoverPeople.push(...batch);
+  renderDeck();
+  toast('💎 새로운 인연 30명을 더 찾았어요');
+}
 function renderDeck(){
   const deck=document.getElementById('deck'); deck.innerHTML='';
   const remaining=discoverPeople.slice(deckIdx);
   if(remaining.length===0){
-    deck.innerHTML='<div class="deck-empty"><div style="font-size:40px">🌙</div><b>오늘의 인연을 모두 봤어요</b><span style="font-size:12.5px">내일 새로운 분들이 찾아와요</span></div>';
+    deck.innerHTML='<div class="deck-empty"><div style="font-size:40px">🌙</div><b>오늘의 인연을 모두 봤어요</b><span style="font-size:12.5px">내일 새로운 분들이 찾아와요</span><button class="find-more" onclick="findMore()"><span class="fm-gem">💎</span> 새로운 인연 바로 찾아보기</button></div>';
     return;
   }
   // render up to 2 cards (back + front)
@@ -1312,7 +1321,7 @@ function openTravelMap(e){
 }
 function closeTravelMap(){document.getElementById('travelMap').classList.remove('on');}
 function renderTravelMap(){
-  const cities=[['🇰🇷 서울',54,42],['🇯🇵 도쿄',63,46],['🇹🇭 방콕',59,62],['🇬🇧 런던',28,31],['🇫🇷 파리',31,36],['🇮🇹 로마',34,45],['🇺🇸 뉴욕',16,44],['🇦🇺 시드니',76,80]];
+  const cities=[['🇰🇷 서울',60,40],['🇯🇵 도쿄',65,42],['🇨🇳 베이징',58,37],['🇨🇳 상하이',61,44],['🇭🇰 홍콩',59,50],['🇹🇼 타이베이',62,49],['🇹🇭 방콕',55,58],['🇸🇬 싱가포르',57,64],['🇮🇳 뭄바이',49,52],['🇦🇪 두바이',46,49],['🇹🇷 이스탄불',40,42],['🇷🇺 모스크바',43,28],['🇬🇧 런던',30,30],['🇫🇷 파리',32,34],['🇳🇱 암스테르담',33,30],['🇩🇪 베를린',35,31],['🇪🇸 바르셀로나',30,40],['🇮🇹 로마',35,43],['🇺🇸 뉴욕',16,42],['🇺🇸 LA',9,47],['🇨🇦 토론토',15,38],['🇲🇽 멕시코시티',12,55],['🇧🇷 상파울루',23,74],['🇦🇺 시드니',72,80],['🇳🇿 오클랜드',80,82]];
   document.getElementById('travelMapBody').innerHTML=`
     <p class="tm-desc">지도를 눌러 위치를 정하거나, 아래 도시를 선택하세요.</p>
     <div class="city-chips">${cities.map(c=>`<span class="cchip" onclick="placePin(${c[1]},${c[2]},'${c[0]}')">${c[0]}</span>`).join('')}</div>
