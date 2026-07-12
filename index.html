@@ -285,7 +285,8 @@
   .rhead .rinfo{flex:1;min-width:0;cursor:pointer;}
   .rhead .rinfo b{font-size:15.5px;font-weight:700;display:block;}
   .rhead .rinfo span{font-size:11.5px;opacity:.9;}
-  .rhead .rsearch{font-size:19px;cursor:pointer;padding:4px;}
+  .rhead .rsearch{cursor:pointer;padding:4px;display:flex;align-items:center;}
+  .rhead .rsearch svg{width:20px;height:20px;}
   .searchbar{flex:0 0 auto;background:#fff;display:none;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid var(--line);}
   .searchbar.on{display:flex;}
   .searchbar input{flex:1;border:none;outline:none;font-size:14px;background:#f1eef2;padding:9px 12px;border-radius:10px;}
@@ -437,7 +438,7 @@
         <span class="bk" onclick="closeRoom()">‹</span>
         <div class="rav" id="rav" onclick="openPeerProfile()"></div>
         <div class="rinfo" onclick="openPeerProfile()"><b id="rname">이름</b><span id="rstatus">온라인</span></div>
-        <span class="rsearch" onclick="toggleSearch()">🔍</span>
+        <span class="rsearch" onclick="toggleSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>
       </div>
       <div class="searchbar" id="searchbar">
         <input id="searchInput" placeholder="대화 내용 검색" oninput="runSearch(this.value)">
