@@ -277,9 +277,15 @@
   .sg-btn.prev{flex:0 0 auto;padding:15px 22px;background:#f0eef1;color:#6a626f;}
   .sg-btn.next{background:var(--main);color:#fff;}
   .sg-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-  .sg-thumb{aspect-ratio:3/4;border-radius:14px;position:relative;box-shadow:0 3px 9px rgba(0,0,0,.08);}
-  .sg-thumb.add{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--main);background:#fff;border:2px dashed var(--light);cursor:pointer;box-shadow:none;}
-  .sg-thumb .sg-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e0566e;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .sg-thumb{aspect-ratio:3/4;border-radius:14px;position:relative;box-shadow:0 3px 9px rgba(0,0,0,.08);touch-action:none;cursor:grab;}
+  .sg-thumb.add{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--main);background:#fff;border:2px dashed var(--light);cursor:pointer;box-shadow:none;touch-action:auto;}
+  .sg-thumb.main{box-shadow:0 0 0 2.5px var(--main), 0 4px 12px rgba(219,106,133,.35);}
+  .sg-thumb .sg-del{position:absolute;top:-6px;right:-6px;width:22px;height:22px;border-radius:50%;background:#e0566e;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:3;}
+  .sg-thumb .sg-badge{position:absolute;left:6px;bottom:6px;display:flex;align-items:center;gap:3px;background:var(--main);color:#fff;font-size:10.5px;font-weight:800;padding:3px 8px 3px 6px;border-radius:20px;box-shadow:0 2px 6px rgba(0,0,0,.28);}
+  .sg-thumb .sg-badge svg{width:11px;height:11px;}
+  .sg-thumb.sg-drag-src{opacity:.3;}
+  .sg-thumb.sg-drop-target{box-shadow:0 0 0 2.5px var(--acc);}
+  .sg-drag-clone{border-radius:14px;box-shadow:0 14px 34px rgba(0,0,0,.35)!important;opacity:.96;transform:scale(1.04);}
   .sg-hint{font-size:12px;color:var(--sub);margin-top:14px;}
   .sg-field{margin-bottom:20px;}
   .sg-field label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:8px;}
@@ -1392,10 +1398,12 @@ function renderSignup(){
   let content='';
   if(st===0){
     content=`<div class="sg-photos">
-      ${m.photos.map((p,i)=>`<div class="sg-thumb" style="background:${p}"><span class="sg-del" onclick="sgDelPhoto(${i})">✕</span>${i===0?'<span class="main-badge">대표</span>':''}</div>`).join('')}
+      ${m.photos.map((p,i)=>`<div class="sg-thumb${i===0?' main':''}" style="background:${p}" onpointerdown="sgDragStart(event,${i})">
+          <span class="sg-del" onpointerdown="event.stopPropagation()" onclick="sgDelPhoto(${i})">✕</span>
+          ${i===0?'<span class="sg-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.9l-5.8 3.06 1.1-6.47L2.6 9.9l6.5-.95z"/></svg>대표</span>':''}</div>`).join('')}
       ${m.photos.length<10?`<div class="sg-thumb add" onclick="addPhoto()">＋</div>`:''}
     </div>
-    <p class="sg-hint">첫 번째 사진이 대표 사진이 돼요 · 최대 10장</p>`;
+    <p class="sg-hint">사진을 드래그해 순서를 바꿀 수 있어요 · 첫 번째가 대표 사진이에요</p>`;
   }else if(st===1){
     content=`
       <div class="sg-field"><label>생년월일</label>
@@ -1441,6 +1449,44 @@ function renderSignup(){
   const _nb=document.querySelector('.sg-body');if(_nb)_nb.scrollTop=_sc;
 }
 function sgDelPhoto(i){myProfile.photos.splice(i,1);renderSignup();}
+/* 사진 드래그 순서 변경 (포인터 기반, 마우스·터치) */
+let sgPD=null, sgDrag=null;
+function sgDragStart(e,i){
+  if(e.target.closest('.sg-del'))return;
+  const grid=document.querySelector('.sg-photos');
+  const thumbs=[...grid.querySelectorAll('.sg-thumb:not(.add)')];
+  sgPD={from:i,sx:e.clientX,sy:e.clientY,thumbs};
+  window.addEventListener('pointermove',sgDragMove);
+  window.addEventListener('pointerup',sgDragEnd);
+}
+function sgDragMove(e){
+  if(sgPD&&!sgDrag){
+    if(Math.abs(e.clientX-sgPD.sx)+Math.abs(e.clientY-sgPD.sy)<6)return;
+    const el=sgPD.thumbs[sgPD.from], r=el.getBoundingClientRect();
+    const clone=el.cloneNode(true);clone.className='sg-thumb sg-drag-clone';
+    clone.style.cssText+=`position:fixed;pointer-events:none;z-index:200;margin:0;width:${r.width}px;height:${r.height}px;left:${r.left}px;top:${r.top}px;`;
+    document.body.appendChild(clone);
+    el.classList.add('sg-drag-src');
+    sgDrag={from:sgPD.from,thumbs:sgPD.thumbs,clone,offx:sgPD.sx-r.left,offy:sgPD.sy-r.top,to:sgPD.from};
+  }
+  if(!sgDrag)return;
+  e.preventDefault();
+  sgDrag.clone.style.left=(e.clientX-sgDrag.offx)+'px';
+  sgDrag.clone.style.top=(e.clientY-sgDrag.offy)+'px';
+  let to=sgDrag.from;
+  sgDrag.thumbs.forEach((t,j)=>{const r=t.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)to=j;});
+  sgDrag.to=to;
+  sgDrag.thumbs.forEach((t,j)=>t.classList.toggle('sg-drop-target',j===to&&j!==sgDrag.from));
+}
+function sgDragEnd(){
+  window.removeEventListener('pointermove',sgDragMove);
+  window.removeEventListener('pointerup',sgDragEnd);
+  if(sgDrag){
+    const {from,to,clone}=sgDrag;clone.remove();
+    if(to!==from){const [p]=myProfile.photos.splice(from,1);myProfile.photos.splice(to,0,p);}
+    sgDrag=null;sgPD=null;renderSignup();
+  }else sgPD=null;
+}
 function sgToggleLang(l){
   const i=myProfile.languages.indexOf(l);
   if(i>=0)myProfile.languages.splice(i,1);
