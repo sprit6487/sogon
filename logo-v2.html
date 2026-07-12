@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>소곤 로고 리디자인</title>
+<style>
+  :root{--main:#DB6A85;--light:#EC92A8;--dark:#C0506F;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo',sans-serif;
+    background:#14121a;color:#e8e8ea;padding:44px 22px 70px;}
+  .wrap{max-width:1000px;margin:0 auto;}
+  header{text-align:center;margin-bottom:8px;}
+  header h1{font-size:25px;font-weight:800;letter-spacing:-0.02em;}
+  header p{color:#9a9aa2;font-size:13.5px;margin-top:8px;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:34px;}
+  @media(max-width:760px){.grid{grid-template-columns:repeat(2,1fr);}}
+  @media(max-width:480px){.grid{grid-template-columns:1fr;}}
+  .card{background:#1c1a24;border:1px solid #2a2732;border-radius:20px;padding:26px 16px 18px;text-align:center;}
+  .icon{width:118px;height:118px;border-radius:29px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden;box-shadow:0 14px 30px rgba(219,106,133,.32);}
+  .icon.rose{background:linear-gradient(145deg,#EC92A8 0%,#DB6A85 52%,#C0506F 100%);}
+  .icon.white{background:#fff;box-shadow:0 14px 30px rgba(0,0,0,.16);}
+  .icon .sheen{position:absolute;top:-30%;left:-10%;width:80%;height:70%;background:radial-gradient(ellipse at center,rgba(255,255,255,.28),transparent 70%);pointer-events:none;}
+  .nm{font-size:15px;font-weight:800;}
+  .nm .tag{font-size:10px;color:#8f8a97;font-weight:600;margin-left:5px;}
+  .desc{font-size:11.5px;color:#a7a2af;line-height:1.5;margin-top:6px;min-height:32px;}
+  .num{font-size:10.5px;color:#7e7a86;letter-spacing:.08em;margin-bottom:10px;}
+  .foot{margin-top:32px;text-align:center;color:#8f8a97;font-size:13px;line-height:1.7;border:1px solid #2a2732;border-radius:14px;padding:15px 20px;background:#1c1a24;}
+  .foot b{color:var(--main);}
+
+  /* ===== marks ===== */
+  /* 1. 클래식 리파인 */
+  .b1{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
+  .b1 i{border-radius:50%;}
+  .b1 i:nth-child(1){width:8px;height:8px;background:#F1A9B9;}
+  .b1 i:nth-child(2){width:10px;height:10px;background:#E585A0;}
+  .b1 i:nth-child(3){width:12px;height:12px;background:var(--main);}
+
+  /* 2. 그라데이션 도트 + 글로우 */
+  .b2{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
+  .b2 i{border-radius:50%;background:linear-gradient(135deg,#F2A6B8,#C0506F);}
+  .b2 i:nth-child(1){width:8px;height:8px;opacity:.7;}
+  .b2 i:nth-child(2){width:10px;height:10px;opacity:.85;}
+  .b2 i:nth-child(3){width:12px;height:12px;box-shadow:0 0 10px rgba(192,80,111,.55);}
+
+  /* 3. 듀오 버블 (대화) */
+  .b3{position:relative;width:74px;height:62px;}
+  .b3 .big{position:absolute;left:0;top:0;width:52px;height:44px;background:#fff;border-radius:18px 18px 18px 6px;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 6px 14px rgba(120,30,55,.22);}
+  .b3 .big i{width:7px;height:7px;border-radius:50%;background:var(--main);}
+  .b3 .big i:first-child{opacity:.5;}.b3 .big i:nth-child(2){opacity:.75;}
+  .b3 .small{position:absolute;right:0;bottom:0;width:34px;height:30px;background:var(--light);border-radius:14px 14px 5px 14px;box-shadow:0 5px 12px rgba(120,30,55,.25);}
+
+  /* 4. 아웃라인 (라인 스타일) */
+  .b4{width:60px;height:54px;border:4px solid #fff;border-radius:20px 20px 20px 6px;display:flex;align-items:center;justify-content:center;gap:7px;}
+  .b4 i{width:8px;height:8px;border-radius:50%;background:#fff;}
+  .b4 i:nth-child(1){opacity:.55;}.b4 i:nth-child(2){opacity:.78;}
+
+  /* 5. 하트 악센트 */
+  .b5{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
+  .b5 i{border-radius:50%;background:#F1A9B9;}
+  .b5 i:nth-child(1){width:8px;height:8px;}
+  .b5 i:nth-child(2){width:10px;height:10px;background:#E585A0;}
+  .b5 .heart{color:var(--main);font-size:15px;line-height:1;margin-top:-1px;}
+
+  /* 6. 인버티드 (화이트 타일) */
+  .b6{width:64px;height:56px;background:linear-gradient(145deg,#EC92A8,#DB6A85 60%,#C0506F);border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(219,106,133,.35);}
+  .b6 i{border-radius:50%;background:#fff;}
+  .b6 i:nth-child(1){width:8px;height:8px;opacity:.7;}
+  .b6 i:nth-child(2){width:10px;height:10px;opacity:.85;}
+  .b6 i:nth-child(3){width:12px;height:12px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>소곤 로고 리디자인</h1>
+    <p>선택하신 "속삭임 말풍선"을 더 다듬은 6가지 · 앱 아이콘 형태로 미리보기</p>
+  </header>
+
+  <div class="grid">
+    <div class="card">
+      <div class="icon rose"><span class="sheen"></span><div class="b1"><i></i><i></i><i></i></div></div>
+      <div class="num">01</div><div class="nm">클래식 리파인<span class="tag">기본 개선</span></div>
+      <div class="desc">현재 로고를 정돈 — 도트에 농도 차이, 부드러운 그림자.</div>
+    </div>
+    <div class="card">
+      <div class="icon rose"><span class="sheen"></span><div class="b2"><i></i><i></i><i></i></div></div>
+      <div class="num">02</div><div class="nm">그라데이션 도트<span class="tag">추천</span></div>
+      <div class="desc">도트에 로즈 그라데이션 + 마지막 도트 은은한 글로우.</div>
+    </div>
+    <div class="card">
+      <div class="icon rose"><span class="sheen"></span><div class="b3"><div class="big"><i></i><i></i></div><div class="small"></div></div></div>
+      <div class="num">03</div><div class="nm">듀오 버블<span class="tag">대화</span></div>
+      <div class="desc">큰 말풍선 + 작은 말풍선이 마주보는 1:1 대화.</div>
+    </div>
+    <div class="card">
+      <div class="icon rose"><span class="sheen"></span><div class="b4"><i></i><i></i><i></i></div></div>
+      <div class="num">04</div><div class="nm">아웃라인<span class="tag">라인</span></div>
+      <div class="desc">얇은 선 말풍선 — 가볍고 미니멀한 인상.</div>
+    </div>
+    <div class="card">
+      <div class="icon rose"><span class="sheen"></span><div class="b5"><i></i><i></i><span class="heart">♥</span></div></div>
+      <div class="num">05</div><div class="nm">하트 악센트<span class="tag">데이팅</span></div>
+      <div class="desc">마지막 도트를 하트로 — 데이팅 정체성 강조.</div>
+    </div>
+    <div class="card">
+      <div class="icon white"><div class="b6"><i></i><i></i><i></i></div></div>
+      <div class="num">06</div><div class="nm">인버티드<span class="tag">라이트</span></div>
+      <div class="desc">화이트 타일 + 로즈 그라데이션 말풍선 (밝은 배경용).</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    마음에 드는 번호를 알려주세요. 고른 안을 <b>스플래시·로그인 로고에 적용</b>하고, 필요하면 세부(색·크기·꼬리)도 다듬어 드릴게요.
+  </div>
+</div>
+</body>
+</html>
