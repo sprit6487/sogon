@@ -242,7 +242,14 @@
   .cal-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 12px;}
   .cal-nav{width:38px;height:38px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--ink);cursor:pointer;border-radius:50%;}
   .cal-nav.dis{color:#d8d3da;cursor:default;}
-  .cal-title{font-size:16px;font-weight:800;cursor:pointer;}
+  .cal-nav.hidden{visibility:hidden;}
+  .cal-title{display:flex;gap:8px;align-items:center;}
+  .cal-title .cal-part{font-size:16px;font-weight:800;cursor:pointer;padding:3px 8px;border-radius:8px;}
+  .cal-title .cal-part.active{background:#fce7ec;color:var(--main);}
+  .month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:6px 0 4px;}
+  .month-opt{text-align:center;padding:14px 0;font-size:14px;border-radius:12px;cursor:pointer;background:#f6f4f6;color:var(--ink);}
+  .month-opt.sel{background:var(--main);color:#fff;font-weight:700;}
+  .month-opt.dis{color:#dbd6dd;background:#faf8fa;cursor:default;}
   .cal-dow{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
   .cal-dow span{text-align:center;font-size:12px;color:var(--sub);padding:6px 0;}
   .cal-dow span:first-child{color:#e0566e;}
@@ -1286,19 +1293,23 @@ function openBirthPicker(mode){
   const cur=mode==='signup'?myProfile.birth:birthDraft;
   let y,m;
   if(cur){const d=new Date(cur);y=d.getFullYear();m=d.getMonth();}else{y=new Date().getFullYear()-30;m=0;}
-  birthCtx={mode,y,m,sel:cur,yearMode:false};
+  birthCtx={mode,y,m,sel:cur,pickMode:null};
   renderBirthCal();
   document.getElementById('birthModal').classList.add('on');
 }
 function closeBirthPicker(){document.getElementById('birthModal').classList.remove('on');}
 function renderBirthCal(){
-  const {y,m,sel,yearMode}=birthCtx;
+  const {y,m,sel,pickMode}=birthCtx;
   const today=new Date();const maxD=new Date(today.getFullYear(),today.getMonth(),today.getDate());
   let inner;
-  if(yearMode){
+  if(pickMode==='year'){
     const maxY=today.getFullYear(),minY=today.getFullYear()-100;let ys='';
     for(let yr=maxY;yr>=minY;yr--)ys+=`<div class="year-opt${yr===y?' sel':''}" onclick="pickYear(${yr})">${yr}년</div>`;
     inner=`<div class="year-list" id="yearList">${ys}</div>`;
+  }else if(pickMode==='month'){
+    let ms='';
+    for(let mo=0;mo<12;mo++){const dis=new Date(y,mo,1)>maxD;ms+=`<div class="month-opt${mo===m?' sel':''}${dis?' dis':''}" ${dis?'':`onclick="pickMonth(${mo})"`}>${mo+1}월</div>`;}
+    inner=`<div class="month-grid">${ms}</div>`;
   }else{
     const first=new Date(y,m,1).getDay();const dim=new Date(y,m+1,0).getDate();
     const selD=sel?new Date(sel):null;
@@ -1314,20 +1325,24 @@ function renderBirthCal(){
   document.getElementById('birthSheet').innerHTML=`
     <div class="mgrip"></div>
     <div class="cal-head">
-      <span class="cal-nav" onclick="calMove(-1)">‹</span>
-      <span class="cal-title" onclick="toggleYearMode()">${y}년 ${m+1}월 ▾</span>
-      <span class="cal-nav${canNext?'':' dis'}" onclick="${canNext?'calMove(1)':''}">›</span>
+      <span class="cal-nav ${pickMode?'hidden':''}" onclick="${pickMode?'':'calMove(-1)'}">‹</span>
+      <span class="cal-title">
+        <span class="cal-part${pickMode==='year'?' active':''}" onclick="birthMode('year')">${y}년</span>
+        <span class="cal-part${pickMode==='month'?' active':''}" onclick="birthMode('month')">${m+1}월</span>
+      </span>
+      <span class="cal-nav ${pickMode?'hidden':(canNext?'':'dis')}" onclick="${(!pickMode&&canNext)?'calMove(1)':''}">›</span>
     </div>
     ${inner}`;
-  if(yearMode){const yl=document.getElementById('yearList');const s=yl&&yl.querySelector('.sel');if(s)s.scrollIntoView({block:'center'});}
+  if(pickMode==='year'){const yl=document.getElementById('yearList');const s=yl&&yl.querySelector('.sel');if(s)s.scrollIntoView({block:'center'});}
 }
 function calMove(delta){let m=birthCtx.m+delta,y=birthCtx.y;if(m<0){m=11;y--;}if(m>11){m=0;y++;}birthCtx.y=y;birthCtx.m=m;renderBirthCal();}
-function toggleYearMode(){birthCtx.yearMode=!birthCtx.yearMode;renderBirthCal();}
+function birthMode(mode){birthCtx.pickMode=birthCtx.pickMode===mode?null:mode;renderBirthCal();}
 function pickYear(yr){
   const today=new Date();const maxD=new Date(today.getFullYear(),today.getMonth(),today.getDate());
   birthCtx.y=yr;if(new Date(yr,birthCtx.m,1)>maxD)birthCtx.m=maxD.getMonth();
-  birthCtx.yearMode=false;renderBirthCal();
+  birthCtx.pickMode=null;renderBirthCal();
 }
+function pickMonth(mo){birthCtx.m=mo;birthCtx.pickMode=null;renderBirthCal();}
 function pickBirth(y,mo,dd){
   const val=`${y}-${String(mo+1).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
   closeBirthPicker();
@@ -1478,13 +1493,12 @@ function renderSignup(){
   const d18=new Date();d18.setFullYear(d18.getFullYear()-18);const maxBirth=d18.toISOString().slice(0,10);
   let content='';
   if(st===0){
-    content=`<div class="sg-photos">
+    content=`<p class="sg-hint" style="margin:-10px 0 16px">사진을 드래그해 순서를 바꿀 수 있어요 · 첫 번째가 대표 사진이에요</p><div class="sg-photos">
       ${m.photos.map((p,i)=>`<div class="sg-thumb${i===0?' main':''}" style="background:${p}" onpointerdown="sgDragStart(event,${i})">
           <span class="sg-del" onpointerdown="event.stopPropagation()" onclick="sgDelPhoto(${i})">✕</span>
           ${i===0?'<span class="sg-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5l2.9 5.9 6.5.95-4.7 4.58 1.1 6.47L12 17.9l-5.8 3.06 1.1-6.47L2.6 9.9l6.5-.95z"/></svg>대표</span>':''}</div>`).join('')}
       ${m.photos.length<10?`<div class="sg-thumb add" onclick="addPhoto()">＋</div>`:''}
-    </div>
-    <p class="sg-hint">사진을 드래그해 순서를 바꿀 수 있어요 · 첫 번째가 대표 사진이에요</p>`;
+    </div>`;
   }else if(st===1){
     content=`
       <div class="sg-field"><label>생년월일</label>
