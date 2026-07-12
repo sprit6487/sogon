@@ -1243,21 +1243,6 @@ function renderProfile(){
     </div>
 
     <div class="pf-sec">
-      <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleSection('interests')">${editSection==='interests'?'완료':'편집'}</span></div>
-      <div class="ints ${editSection==='interests'?'editing':''}">
-        ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
-        ${editSection==='interests'&&m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
-      </div>
-    </div>
-
-    <div class="pf-sec">
-      <div class="sec-h"><b>나에 대한 설명</b><span class="ed" onclick="toggleSection('about')">${editSection==='about'?'완료':'편집'}</span></div>
-      ${editSection==='about'
-        ? `<textarea id="aboutInput" placeholder="자기소개를 입력하세요" oninput="aboutDraft=this.value">${m.about}</textarea>`
-        : `<p>${esc(m.about)}</p>`}
-    </div>
-
-    <div class="pf-sec">
       <div class="sec-h"><b>기본 정보</b><span class="ed" onclick="toggleSection('info')">${editSection==='info'?'완료':'편집'}</span></div>
       ${editSection==='info'
         ? (m.birthChanged
@@ -1283,6 +1268,21 @@ function renderProfile(){
       ${editSection==='info'
         ? `<div class="info-row edit lang-row" onclick="openLangPicker()"><span>언어</span><b class="lang-field">${langDraft.length?langDraft.join(', '):'선택'} <span class="caret">▾</span></b></div>`
         : `<div class="info-row"><span>언어</span><b>${m.languages.join(', ')}</b></div>`}
+    </div>
+
+    <div class="pf-sec">
+      <div class="sec-h"><b>관심사</b><span class="ed" onclick="toggleSection('interests')">${editSection==='interests'?'완료':'편집'}</span></div>
+      <div class="ints ${editSection==='interests'?'editing':''}">
+        ${m.interests.map((t,i)=>`<span class="int">${t}<span class="x" onclick="delInterest(${i})">✕</span></span>`).join('')}
+        ${editSection==='interests'&&m.interests.length<10?'<span class="int add" onclick="addInterest()">＋ 추가</span>':''}
+      </div>
+    </div>
+
+    <div class="pf-sec">
+      <div class="sec-h"><b>나에 대한 설명</b><span class="ed" onclick="toggleSection('about')">${editSection==='about'?'완료':'편집'}</span></div>
+      ${editSection==='about'
+        ? `<textarea id="aboutInput" placeholder="자기소개를 입력하세요" oninput="aboutDraft=this.value">${m.about}</textarea>`
+        : `<p>${esc(m.about)}</p>`}
     </div>
 
     <div class="pf-sec">
