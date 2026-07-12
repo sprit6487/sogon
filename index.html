@@ -11,17 +11,16 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;scrollbar-width:none;-ms-overflow-style:none;}
   *::-webkit-scrollbar{width:0;height:0;display:none;}
-  html,body{height:100%;}
   body{
     font-family:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo',sans-serif;
-    background:#e6e4e9; display:flex; justify-content:center; align-items:stretch;
-    margin:0; padding:0; color:var(--ink);
+    background:#15131a; display:flex; flex-direction:column; align-items:center;
+    min-height:100vh; padding:34px 16px 50px; color:var(--ink);
   }
 
-  /* phone (frameless, fills viewport) */
-  .phone{width:100%;max-width:440px;height:100vh;height:100dvh;background:var(--bg);border-radius:0;padding:0;box-shadow:0 0 40px rgba(0,0,0,.12);}
-  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:0;overflow:hidden;display:flex;flex-direction:column;}
-  .notch{display:none;}
+  /* phone */
+  .phone{width:380px;max-width:96vw;height:800px;background:#000;border-radius:46px;padding:11px;box-shadow:0 30px 70px rgba(0,0,0,.6);}
+  .screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:36px;overflow:hidden;display:flex;flex-direction:column;}
+  .notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:128px;height:26px;background:#000;border-radius:0 0 18px 18px;z-index:60;}
 
   /* ---------- SPLASH ---------- */
   .splash{position:absolute;inset:0;z-index:100;background:linear-gradient(160deg,var(--light) 0%,var(--main) 52%,var(--dark) 100%);
@@ -905,7 +904,7 @@ function openRequest(i){
     <div class="mbody"><p>${p.intro}</p></div>
     <div class="mbtns">
       <button class="mbtn no" onclick="decideReq(false)">거절</button>
-      <button class="mbtn yes" onclick="decideReq(true)">수락하고 대화 시작 💬</button>
+      <button class="mbtn yes" onclick="decideReq(true)">대화 시작</button>
     </div>`;
   document.getElementById('modal').classList.add('on');
 }
