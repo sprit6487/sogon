@@ -91,6 +91,35 @@
   .mp-body{flex:1;overflow-y:auto;padding:22px 20px 26px;}
   .mp-save{margin-top:22px;}
   .mp-save button{width:100%;padding:14px;border-radius:14px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;}
+  /* 여행 친구 찾기 */
+  .travel-card{background:#faf5f7;border:1.5px solid #f0dce3;border-radius:14px;padding:13px 14px;cursor:pointer;}
+  .travel-card:active{background:#f6edf1;}
+  .tc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .tc-title{font-size:14px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:6px;}
+  .tc-gem{font-size:13px;}
+  .tc-loc{font-size:12.5px;color:var(--main);font-weight:700;white-space:nowrap;}
+  .tc-chev{color:#c8c2cd;font-size:18px;}
+  .tc-desc{font-size:12px;color:var(--sub);margin-top:5px;}
+  #travelMap{position:absolute;inset:0;z-index:49;background:var(--bg);display:none;flex-direction:column;}
+  #travelMap.on{display:flex;}
+  .tm-body{flex:1;display:flex;flex-direction:column;padding:16px 18px 22px;overflow-y:auto;}
+  .tm-desc{font-size:12.5px;color:var(--sub);padding:2px 2px 12px;}
+  .city-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+  .cchip{font-size:12.5px;padding:7px 12px;border-radius:20px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;background:#fff;}
+  .cchip:active{background:#f3eef1;}
+  .map-area{position:relative;flex:1;min-height:240px;background:#e9eef0;border-radius:16px;overflow:hidden;cursor:crosshair;box-shadow:inset 0 0 0 1px #dfe6e8;}
+  .map-area::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent 0 38px,#dde5e7 38px 40px),repeating-linear-gradient(90deg,transparent 0 46px,#dde5e7 46px 48px);}
+  .map-area .blob{position:absolute;border-radius:45% 55% 52% 48%;opacity:.6;}
+  .map-pin{position:absolute;transform:translate(-50%,-100%);pointer-events:none;filter:drop-shadow(0 3px 4px rgba(0,0,0,.25));}
+  .tm-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;}
+  .tm-sel{font-size:13.5px;color:var(--ink);}
+  .tm-sel b{color:var(--main);}
+  .tm-apply{padding:13px 22px;border-radius:12px;background:var(--main);color:#fff;font-size:15px;font-weight:700;border:none;cursor:pointer;flex:0 0 auto;}
+  .tm-clear{text-align:center;margin-top:12px;}
+  .tm-clear span{font-size:12.5px;color:#b6b0bb;text-decoration:underline;cursor:pointer;}
+  .travel-banner{display:none;align-items:center;justify-content:center;gap:6px;background:#fdeef2;color:var(--main);font-size:12px;font-weight:600;padding:9px 14px;flex:0 0 auto;}
+  .travel-banner b{font-weight:800;}
+  .travel-banner .tb-off{margin-left:6px;color:var(--sub);text-decoration:underline;cursor:pointer;font-weight:500;}
 
   .view{flex:1 1 auto;position:relative;overflow:hidden;display:none;}
   .view.on{display:flex;flex-direction:column;}
@@ -525,6 +554,7 @@
 
     <!-- ============ DISCOVER ============ -->
     <div class="view on" id="discover">
+      <div class="travel-banner" id="travelBanner" style="display:none"></div>
       <div class="deck" id="deck"></div>
       <div class="acts">
         <button class="act undo" onclick="undoLast()" title="직전 취소">↩<span class="gem">💎</span></button>
@@ -635,6 +665,12 @@
     <div id="matchPanel">
       <div class="set-head"><span class="bk" onclick="closeMatchPanel()">‹</span><b>매칭 설정</b></div>
       <div class="mp-body" id="mpBody"></div>
+    </div>
+
+    <!-- ============ TRAVEL MAP ============ -->
+    <div id="travelMap">
+      <div class="set-head"><span class="bk" onclick="closeTravelMap()">‹</span><b>여행 친구 찾기 💎</b></div>
+      <div class="tm-body" id="travelMapBody"></div>
     </div>
 
     <!-- ============ SIGNUP ============ -->
@@ -826,6 +862,7 @@ function go(v){
   const nav=document.getElementById('nav-'+v); if(nav)nav.classList.add('on');
   document.getElementById('headGear').style.display=(v==='profile')?'block':'none';
   document.getElementById('headMatch').style.display=(v==='discover')?'block':'none';
+  updateTravelBanner();
   closeRoom();
 }
 
@@ -1213,7 +1250,7 @@ let myProfile={
   interests:['전시·미술','등산','와인','영화','여행','커피'],
   about:'여유로운 주말을 좋아하는 마케터입니다.\n새로운 문화와 사람에 대한 호기심이 많아요. 좋은 음악과 깊은 대화를 좋아하고, 서두르지 않고 천천히 알아가는 인연을 기다립니다 🌿',
   birth:'1983-05-12', gender:'남성', languages:['한국어','English'], birthChanged:false, genderChanged:false,
-  match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null
+  match:{gender:'여성', ageMin:30, ageMax:45, distMin:10, distMax:100}, countryChangedAt:null, travelLocation:null
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
 function matchControlsHTML(){
@@ -1232,6 +1269,14 @@ function matchControlsHTML(){
          <div class="fill" id="distFill" style="left:${(matchDraft.distMin-10)/500*100}%;width:${(matchDraft.distMax-matchDraft.distMin)/500*100}%"></div>
          <input type="range" id="distMinR" min="10" max="510" step="10" value="${matchDraft.distMin}" oninput="distSlide('min')">
          <input type="range" id="distMaxR" min="10" max="510" step="10" value="${matchDraft.distMax}" oninput="distSlide('max')">
+       </div></div>
+     <div class="mr-field">
+       <div class="travel-card" onclick="openTravelMap(event)">
+         <div class="tc-top">
+           <span class="tc-title">여행 친구 찾기 <span class="tc-gem">💎</span></span>
+           ${myProfile.travelLocation?`<span class="tc-loc">📍 ${myProfile.travelLocation}</span>`:'<span class="tc-chev">›</span>'}
+         </div>
+         <div class="tc-desc">내 위치를 바꿔 여행 친구를 찾아볼 수 있어요</div>
        </div></div>`;
 }
 function refreshMatch(){
@@ -1255,6 +1300,61 @@ function saveMatchPanel(){
   toast('✅ 매칭 설정을 저장했어요');
 }
 function closeMatchPanel(){document.getElementById('matchPanel').classList.remove('on');}
+
+/* 여행 친구 찾기 (위치 변경) */
+const PIN_SVG='<svg viewBox="0 0 24 24" width="32" height="32"><path d="M12 2C8 2 5 5 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-4-3-7-7-7z" fill="#DB6A85" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="9" r="2.7" fill="#fff"/></svg>';
+let travelSel=null;
+function openTravelMap(e){
+  if(e)e.stopPropagation();
+  travelSel=myProfile.travelLocation?{name:myProfile.travelLocation,x:50,y:48}:null;
+  renderTravelMap();
+  document.getElementById('travelMap').classList.add('on');
+}
+function closeTravelMap(){document.getElementById('travelMap').classList.remove('on');}
+function renderTravelMap(){
+  const cities=[['🇰🇷 서울',54,42],['🇯🇵 도쿄',63,46],['🇹🇭 방콕',59,62],['🇬🇧 런던',28,31],['🇫🇷 파리',31,36],['🇮🇹 로마',34,45],['🇺🇸 뉴욕',16,44],['🇦🇺 시드니',76,80]];
+  document.getElementById('travelMapBody').innerHTML=`
+    <p class="tm-desc">지도를 눌러 위치를 정하거나, 아래 도시를 선택하세요.</p>
+    <div class="city-chips">${cities.map(c=>`<span class="cchip" onclick="placePin(${c[1]},${c[2]},'${c[0]}')">${c[0]}</span>`).join('')}</div>
+    <div class="map-area" id="mapArea" onclick="mapClick(event)">
+      <span class="blob" style="width:120px;height:86px;background:#bfe0c8;left:12%;top:18%;"></span>
+      <span class="blob" style="width:140px;height:110px;background:#a9cbe6;right:-8%;bottom:6%;"></span>
+      <span class="blob" style="width:78px;height:66px;background:#bfe0c8;left:58%;top:52%;"></span>
+      <span class="blob" style="width:60px;height:60px;background:#a9cbe6;left:5%;bottom:12%;"></span>
+      <div class="map-pin" id="mapPin" style="display:none">${PIN_SVG}</div>
+    </div>
+    <div class="tm-bottom">
+      <div class="tm-sel">선택: <b id="tmSelName">${travelSel?travelSel.name:'없음'}</b></div>
+      <button class="tm-apply" onclick="applyTravel()">적용하기</button>
+    </div>
+    ${myProfile.travelLocation?`<div class="tm-clear"><span onclick="clearTravel()">여행 모드 해제 (내 실제 위치로)</span></div>`:''}`;
+  if(travelSel)placePin(travelSel.x,travelSel.y,travelSel.name);
+}
+function mapClick(e){
+  const r=document.getElementById('mapArea').getBoundingClientRect();
+  placePin((e.clientX-r.left)/r.width*100,(e.clientY-r.top)/r.height*100,'선택한 위치');
+}
+function placePin(x,y,name){
+  travelSel={name,x,y};
+  const p=document.getElementById('mapPin');if(p){p.style.display='block';p.style.left=x+'%';p.style.top=y+'%';}
+  const n=document.getElementById('tmSelName');if(n)n.textContent=name;
+}
+function applyTravel(){
+  if(!travelSel){toast('위치를 선택해주세요');return;}
+  myProfile.travelLocation=travelSel.name;saveProfileLS();
+  closeTravelMap();refreshMatch();updateTravelBanner();
+  toast('✈️ '+travelSel.name+' 위치로 여행 모드가 켜졌어요');
+}
+function clearTravel(){
+  myProfile.travelLocation=null;saveProfileLS();
+  closeTravelMap();refreshMatch();updateTravelBanner();
+  toast('여행 모드를 해제했어요');
+}
+function updateTravelBanner(){
+  const b=document.getElementById('travelBanner');if(!b)return;
+  if(myProfile.travelLocation){b.style.display='flex';b.innerHTML=`✈️ 여행 모드 · <b>${myProfile.travelLocation}</b> 기준으로 탐색 중 <span class="tb-off" onclick="clearTravel()">해제</span>`;}
+  else b.style.display='none';
+}
 function ageSlide(which){
   let mn=+document.getElementById('ageMinR').value, mx=+document.getElementById('ageMaxR').value;
   if(mn>mx){if(which==='min'){mx=mn;document.getElementById('ageMaxR').value=mx;}else{mn=mx;document.getElementById('ageMinR').value=mn;}}
@@ -1622,7 +1722,7 @@ function refreshProfileViews(){
   if(s&&s.classList.contains('on'))renderSignup();
 }
 function openSignup(){
-  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';myProfile.birthChanged=false;myProfile.genderChanged=false;myProfile.countryChangedAt=null;
+  myProfile.photos=[];myProfile.birth='';myProfile.gender='';myProfile.country='';myProfile.languages=[];myProfile.interests=[];myProfile.about='';myProfile.birthChanged=false;myProfile.genderChanged=false;myProfile.countryChangedAt=null;myProfile.travelLocation=null;
   signupStep=0;
   document.getElementById('signup').classList.add('on');
   renderSignup();
