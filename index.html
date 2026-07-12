@@ -1349,8 +1349,7 @@ function renderStore(){
         <div class="bd-left"><span class="bd-ico">💎</span><div><div class="bd-amt">${b.amt+b.bonus}개${b.bonus?` <span class="bd-bonus">+${b.bonus} 보너스</span>`:''}</div>${b.bonus?`<div class="bd-base">${b.amt}개 + ${b.bonus}개</div>`:''}</div></div>
         <button class="bd-buy" onclick="buyDiamonds(${i})">₩${won(b.price)}</button>
       </div>`).join('')}
-    </div>
-    <p class="store-note">※ 목업 화면입니다. 실제 결제는 앱스토어·구글 인앱결제로 진행됩니다.</p>`;
+    </div>`;
 }
 function buyDiamonds(i){
   const b=DIA_BUNDLES[i];const total=b.amt+b.bonus;
