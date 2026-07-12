@@ -933,8 +933,7 @@ function undoLast(){
     renderChats();updateChatBadge();
   }
   renderDeck();
-  const label={skip:'넘기기',request:'친구 신청',super:'슈퍼라이크',report:'신고'}[last.type]||'선택';
-  toast('↩ 직전 '+label+eulReul(label)+' 되돌렸어요');
+  toast('↩ 직전으로 되돌렸어요.');
 }
 
 /* report */
