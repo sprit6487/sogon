@@ -227,10 +227,19 @@
   .gender-mini .gm{font-size:13px;padding:6px 13px;border-radius:10px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;}
   .gender-mini .gm.sel{border-color:var(--main);background:#fce7ec;color:var(--main);font-weight:700;}
   .edit-hint{font-size:11.5px;color:var(--sub);text-align:right;padding:6px 0 2px;}
-  .range-mini{display:flex;align-items:center;gap:6px;}
-  .range-mini select,.dist-sel{border:1px solid var(--line);border-radius:9px;padding:6px 8px;font-size:13.5px;font-family:inherit;background:#f4f1f4;color:var(--ink);outline:none;cursor:pointer;}
-  .range-mini select:focus,.dist-sel:focus{border-color:var(--main);}
-  .range-mini span{font-size:13px;color:var(--sub);}
+  .mr-field{margin-bottom:18px;}
+  .mr-field:last-child{margin-bottom:2px;}
+  .mr-head{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+  .mr-head b{color:var(--main);font-weight:700;font-size:13.5px;}
+  .age-range{position:relative;height:26px;padding:0 2px;}
+  .age-range .rail{position:absolute;top:11px;left:2px;right:2px;height:4px;border-radius:2px;background:#eceaef;}
+  .age-range .fill{position:absolute;top:11px;height:4px;border-radius:2px;background:var(--main);}
+  .age-range input[type=range]{position:absolute;top:0;left:0;width:100%;height:26px;margin:0;-webkit-appearance:none;appearance:none;background:none;pointer-events:none;}
+  .age-range input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#fff;border:2.5px solid var(--main);box-shadow:0 2px 6px rgba(0,0,0,.22);cursor:pointer;pointer-events:auto;}
+  .age-range input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#fff;border:2.5px solid var(--main);box-shadow:0 2px 6px rgba(0,0,0,.22);cursor:pointer;pointer-events:auto;}
+  .dist-chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .dchip{font-size:12.5px;padding:7px 13px;border-radius:20px;border:1.5px solid var(--line);color:#6a626f;cursor:pointer;}
+  .dchip.sel{border-color:var(--main);background:#fce7ec;color:var(--main);font-weight:700;}
   .interest-input{width:100%;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:14.5px;font-family:inherit;outline:none;margin-bottom:14px;}
   .interest-input:focus{border-color:var(--main);}
   .date-input{font-family:inherit;text-align:right;}
@@ -1185,7 +1194,14 @@ let myProfile={
   match:{gender:'여성', ageMin:30, ageMax:45, distance:50}, countryChangedAt:null
 };
 let editSection=null, aboutDraft='', birthDraft='', langDraft=[], countryDraft='', genderDraft='', matchDraft={};
-function ageOpts(sel){let o='';for(let a=19;a<=65;a++)o+=`<option value="${a}"${a===sel?' selected':''}>${a}</option>`;return o;}
+function ageSlide(which){
+  let mn=+document.getElementById('ageMinR').value, mx=+document.getElementById('ageMaxR').value;
+  if(mn>mx){if(which==='min'){mx=mn;document.getElementById('ageMaxR').value=mx;}else{mn=mx;document.getElementById('ageMinR').value=mn;}}
+  matchDraft.ageMin=mn;matchDraft.ageMax=mx;
+  const l=(mn-19)/46*100, r=(mx-19)/46*100;
+  const f=document.getElementById('ageFill');if(f){f.style.left=l+'%';f.style.width=(r-l)+'%';}
+  const lb=document.getElementById('ageLabel');if(lb)lb.textContent=mn+' ~ '+mx+'세';
+}
 function countryLocked(){if(!myProfile.countryChangedAt)return false;const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return new Date()<n;}
 function countryNextDate(){const n=new Date(myProfile.countryChangedAt);n.setFullYear(n.getFullYear()+1);return `${n.getFullYear()}년 ${n.getMonth()+1}월 ${n.getDate()}일`;}
 /* 생년월일 → 만 나이(국제 통용) */
@@ -1263,13 +1279,17 @@ function renderProfile(){
     <div class="pf-sec">
       <div class="sec-h"><b>매칭 설정</b><span class="ed" onclick="toggleSection('match')">${editSection==='match'?'완료':'편집'}</span></div>
       ${editSection==='match'
-        ? `<div class="info-row edit"><span>관심 성별</span><div class="gender-mini">${['남성','여성','모두'].map(g=>`<span class="gm ${matchDraft.gender===g?'sel':''}" onclick="matchDraft.gender='${g}';renderProfile()">${g}</span>`).join('')}</div></div>
-           <div class="info-row edit"><span>나이 범위</span><div class="range-mini">
-             <select onchange="matchDraft.ageMin=+this.value;if(matchDraft.ageMax<matchDraft.ageMin)matchDraft.ageMax=matchDraft.ageMin;renderProfile()">${ageOpts(matchDraft.ageMin)}</select>
-             <span>~</span>
-             <select onchange="matchDraft.ageMax=+this.value;if(matchDraft.ageMin>matchDraft.ageMax)matchDraft.ageMin=matchDraft.ageMax;renderProfile()">${ageOpts(matchDraft.ageMax)}</select>
-             <span>세</span></div></div>
-           <div class="info-row edit"><span>거리</span><select class="dist-sel" onchange="matchDraft.distance=+this.value;renderProfile()">${[10,25,50,100,0].map(d=>`<option value="${d}"${d===matchDraft.distance?' selected':''}>${d===0?'제한 없음':d+'km 이내'}</option>`).join('')}</select></div>`
+        ? `<div class="mr-field"><div class="mr-head">관심 성별</div>
+             <div class="gender-mini">${['남성','여성','모두'].map(g=>`<span class="gm ${matchDraft.gender===g?'sel':''}" onclick="matchDraft.gender='${g}';renderProfile()">${g}</span>`).join('')}</div></div>
+           <div class="mr-field"><div class="mr-head">관심 나이 <b id="ageLabel">${matchDraft.ageMin} ~ ${matchDraft.ageMax}세</b></div>
+             <div class="age-range">
+               <div class="rail"></div>
+               <div class="fill" id="ageFill" style="left:${(matchDraft.ageMin-19)/46*100}%;width:${(matchDraft.ageMax-matchDraft.ageMin)/46*100}%"></div>
+               <input type="range" id="ageMinR" min="19" max="65" value="${matchDraft.ageMin}" oninput="ageSlide('min')">
+               <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
+             </div></div>
+           <div class="mr-field"><div class="mr-head">거리</div>
+             <div class="dist-chips">${[10,25,50,100,0].map(d=>`<span class="dchip ${matchDraft.distance===d?'sel':''}" onclick="matchDraft.distance=${d};renderProfile()">${d===0?'제한없음':d+'km'}</span>`).join('')}</div></div>`
         : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
            <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
            <div class="info-row"><span>거리</span><b>${m.match.distance===0?'제한 없음':m.match.distance+'km 이내'}</b></div>`}

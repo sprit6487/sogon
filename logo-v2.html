@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>소곤 로고 리디자인</title>
+<title>소곤 로고 리디자인 2</title>
 <style>
   :root{--main:#DB6A85;--light:#EC92A8;--dark:#C0506F;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -19,99 +19,110 @@
   .card{background:#1c1a24;border:1px solid #2a2732;border-radius:20px;padding:26px 16px 18px;text-align:center;}
   .icon{width:118px;height:118px;border-radius:29px;position:relative;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;overflow:hidden;box-shadow:0 14px 30px rgba(219,106,133,.32);}
   .icon.rose{background:linear-gradient(145deg,#EC92A8 0%,#DB6A85 52%,#C0506F 100%);}
-  .icon.white{background:#fff;box-shadow:0 14px 30px rgba(0,0,0,.16);}
-  .icon .sheen{position:absolute;top:-30%;left:-10%;width:80%;height:70%;background:radial-gradient(ellipse at center,rgba(255,255,255,.28),transparent 70%);pointer-events:none;}
+  .icon .sheen{position:absolute;top:-32%;left:-12%;width:80%;height:70%;background:radial-gradient(ellipse at center,rgba(255,255,255,.30),transparent 70%);pointer-events:none;}
+  .icon svg{width:62px;height:62px;position:relative;filter:drop-shadow(0 4px 8px rgba(120,20,45,.22));}
+  .wordmark{position:relative;color:#fff;font-weight:800;font-size:34px;letter-spacing:-0.01em;filter:drop-shadow(0 4px 8px rgba(120,20,45,.25));}
+  .wordmark .dot{position:absolute;top:2px;right:-9px;width:8px;height:8px;border-radius:50%;background:#fff;}
   .nm{font-size:15px;font-weight:800;}
   .nm .tag{font-size:10px;color:#8f8a97;font-weight:600;margin-left:5px;}
   .desc{font-size:11.5px;color:#a7a2af;line-height:1.5;margin-top:6px;min-height:32px;}
   .num{font-size:10.5px;color:#7e7a86;letter-spacing:.08em;margin-bottom:10px;}
   .foot{margin-top:32px;text-align:center;color:#8f8a97;font-size:13px;line-height:1.7;border:1px solid #2a2732;border-radius:14px;padding:15px 20px;background:#1c1a24;}
   .foot b{color:var(--main);}
-
-  /* ===== marks ===== */
-  /* 1. 클래식 리파인 */
-  .b1{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
-  .b1 i{border-radius:50%;}
-  .b1 i:nth-child(1){width:8px;height:8px;background:#F1A9B9;}
-  .b1 i:nth-child(2){width:10px;height:10px;background:#E585A0;}
-  .b1 i:nth-child(3){width:12px;height:12px;background:var(--main);}
-
-  /* 2. 그라데이션 도트 + 글로우 */
-  .b2{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
-  .b2 i{border-radius:50%;background:linear-gradient(135deg,#F2A6B8,#C0506F);}
-  .b2 i:nth-child(1){width:8px;height:8px;opacity:.7;}
-  .b2 i:nth-child(2){width:10px;height:10px;opacity:.85;}
-  .b2 i:nth-child(3){width:12px;height:12px;box-shadow:0 0 10px rgba(192,80,111,.55);}
-
-  /* 3. 듀오 버블 (대화) */
-  .b3{position:relative;width:74px;height:62px;}
-  .b3 .big{position:absolute;left:0;top:0;width:52px;height:44px;background:#fff;border-radius:18px 18px 18px 6px;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 6px 14px rgba(120,30,55,.22);}
-  .b3 .big i{width:7px;height:7px;border-radius:50%;background:var(--main);}
-  .b3 .big i:first-child{opacity:.5;}.b3 .big i:nth-child(2){opacity:.75;}
-  .b3 .small{position:absolute;right:0;bottom:0;width:34px;height:30px;background:var(--light);border-radius:14px 14px 5px 14px;box-shadow:0 5px 12px rgba(120,30,55,.25);}
-
-  /* 4. 아웃라인 (라인 스타일) */
-  .b4{width:60px;height:54px;border:4px solid #fff;border-radius:20px 20px 20px 6px;display:flex;align-items:center;justify-content:center;gap:7px;}
-  .b4 i{width:8px;height:8px;border-radius:50%;background:#fff;}
-  .b4 i:nth-child(1){opacity:.55;}.b4 i:nth-child(2){opacity:.78;}
-
-  /* 5. 하트 악센트 */
-  .b5{width:64px;height:56px;background:#fff;border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(120,30,55,.25);}
-  .b5 i{border-radius:50%;background:#F1A9B9;}
-  .b5 i:nth-child(1){width:8px;height:8px;}
-  .b5 i:nth-child(2){width:10px;height:10px;background:#E585A0;}
-  .b5 .heart{color:var(--main);font-size:15px;line-height:1;margin-top:-1px;}
-
-  /* 6. 인버티드 (화이트 타일) */
-  .b6{width:64px;height:56px;background:linear-gradient(145deg,#EC92A8,#DB6A85 60%,#C0506F);border-radius:22px 22px 22px 7px;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 7px 16px rgba(219,106,133,.35);}
-  .b6 i{border-radius:50%;background:#fff;}
-  .b6 i:nth-child(1){width:8px;height:8px;opacity:.7;}
-  .b6 i:nth-child(2){width:10px;height:10px;opacity:.85;}
-  .b6 i:nth-child(3){width:12px;height:12px;}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>소곤 로고 리디자인</h1>
-    <p>선택하신 "속삭임 말풍선"을 더 다듬은 6가지 · 앱 아이콘 형태로 미리보기</p>
+    <h1>소곤 로고 리디자인 · 새 방향</h1>
+    <p>음성·소리 · 하트 · 타이포 등 완전히 다른 6가지</p>
   </header>
 
   <div class="grid">
+
+    <!-- 1. 음성 말풍선 -->
     <div class="card">
-      <div class="icon rose"><span class="sheen"></span><div class="b1"><i></i><i></i><i></i></div></div>
-      <div class="num">01</div><div class="nm">클래식 리파인<span class="tag">기본 개선</span></div>
-      <div class="desc">현재 로고를 정돈 — 도트에 농도 차이, 부드러운 그림자.</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <svg viewBox="0 0 72 72">
+          <rect x="9" y="12" width="54" height="40" rx="15" fill="#fff"/>
+          <path d="M22 50 h13 l-8 12 z" fill="#fff"/>
+          <rect x="23" y="28" width="5" height="8" rx="2.5" fill="#DB6A85"/>
+          <rect x="31.5" y="23" width="5" height="18" rx="2.5" fill="#E888A0"/>
+          <rect x="40" y="19" width="5" height="26" rx="2.5" fill="#DB6A85"/>
+          <rect x="48.5" y="26" width="5" height="12" rx="2.5" fill="#E888A0"/>
+        </svg>
+      </div>
+      <div class="num">01</div><div class="nm">음성 말풍선<span class="tag">보이스</span></div>
+      <div class="desc">말풍선 안 소리 파형 — "소곤소곤 목소리"를 담음.</div>
     </div>
+
+    <!-- 2. 속삭임 물결 -->
     <div class="card">
-      <div class="icon rose"><span class="sheen"></span><div class="b2"><i></i><i></i><i></i></div></div>
-      <div class="num">02</div><div class="nm">그라데이션 도트<span class="tag">추천</span></div>
-      <div class="desc">도트에 로즈 그라데이션 + 마지막 도트 은은한 글로우.</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <svg viewBox="0 0 72 72">
+          <circle cx="22" cy="36" r="6.5" fill="#fff"/>
+          <path d="M33 25 a15 15 0 0 1 0 22" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+          <path d="M42 19 a23 23 0 0 1 0 34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+        </svg>
+      </div>
+      <div class="num">02</div><div class="nm">속삭임 물결<span class="tag">미니멀</span></div>
+      <div class="desc">한 점에서 번지는 소리 — 가장 간결하고 상징적.</div>
     </div>
+
+    <!-- 3. 대화 하트 -->
     <div class="card">
-      <div class="icon rose"><span class="sheen"></span><div class="b3"><div class="big"><i></i><i></i></div><div class="small"></div></div></div>
-      <div class="num">03</div><div class="nm">듀오 버블<span class="tag">대화</span></div>
-      <div class="desc">큰 말풍선 + 작은 말풍선이 마주보는 1:1 대화.</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <svg viewBox="0 0 72 72">
+          <rect x="9" y="11" width="54" height="40" rx="15" fill="#fff"/>
+          <path d="M27 49 h13 l-7 12 z" fill="#fff"/>
+          <path d="M36 41 c-8-5.5-13-9.5-13-15.5 a6.8 6.8 0 0 1 13-2.8 a6.8 6.8 0 0 1 13 2.8 c0 6-5 10-13 15.5z" fill="#DB6A85"/>
+        </svg>
+      </div>
+      <div class="num">03</div><div class="nm">대화 하트<span class="tag">추천</span></div>
+      <div class="desc">말풍선 속 하트 — 대화(소곤)와 호감(데이팅)을 한 컷에.</div>
     </div>
+
+    <!-- 4. 두 마음 -->
     <div class="card">
-      <div class="icon rose"><span class="sheen"></span><div class="b4"><i></i><i></i><i></i></div></div>
-      <div class="num">04</div><div class="nm">아웃라인<span class="tag">라인</span></div>
-      <div class="desc">얇은 선 말풍선 — 가볍고 미니멀한 인상.</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <svg viewBox="0 0 72 72">
+          <g transform="translate(30,16)"><path d="M13,26 C13,26 1,17 1,8 C1,3 5,0 9,0 C11,0 12,1 13,3 C14,1 15,0 17,0 C21,0 25,3 25,8 C25,17 13,26 13,26 Z" fill="#F4AABB"/></g>
+          <g transform="translate(15,22)"><path d="M13,26 C13,26 1,17 1,8 C1,3 5,0 9,0 C11,0 12,1 13,3 C14,1 15,0 17,0 C21,0 25,3 25,8 C25,17 13,26 13,26 Z" fill="#fff"/></g>
+        </svg>
+      </div>
+      <div class="num">04</div><div class="nm">두 마음<span class="tag">커플</span></div>
+      <div class="desc">겹쳐진 두 하트 — 서로에게 다가가는 두 사람.</div>
     </div>
+
+    <!-- 5. 소곤 워드마크 -->
     <div class="card">
-      <div class="icon rose"><span class="sheen"></span><div class="b5"><i></i><i></i><span class="heart">♥</span></div></div>
-      <div class="num">05</div><div class="nm">하트 악센트<span class="tag">데이팅</span></div>
-      <div class="desc">마지막 도트를 하트로 — 데이팅 정체성 강조.</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <div class="wordmark">소곤<span class="dot"></span></div>
+      </div>
+      <div class="num">05</div><div class="nm">소곤 워드마크<span class="tag">타이포</span></div>
+      <div class="desc">한글 "소곤"을 그대로 로고로 — 직관적이고 기억하기 쉬움.</div>
     </div>
+
+    <!-- 6. 사운드바 -->
     <div class="card">
-      <div class="icon white"><div class="b6"><i></i><i></i><i></i></div></div>
-      <div class="num">06</div><div class="nm">인버티드<span class="tag">라이트</span></div>
-      <div class="desc">화이트 타일 + 로즈 그라데이션 말풍선 (밝은 배경용).</div>
+      <div class="icon rose"><span class="sheen"></span>
+        <svg viewBox="0 0 72 72">
+          <g fill="#fff">
+            <rect x="14" y="30" width="7" height="12" rx="3.5"/>
+            <rect x="25" y="22" width="7" height="28" rx="3.5"/>
+            <rect x="36" y="15" width="7" height="42" rx="3.5"/>
+            <rect x="47" y="25" width="7" height="22" rx="3.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="num">06</div><div class="nm">사운드바<span class="tag">모던</span></div>
+      <div class="desc">부드러운 음성 파형만으로 — 세련되고 확장성 좋음.</div>
     </div>
+
   </div>
 
   <div class="foot">
-    마음에 드는 번호를 알려주세요. 고른 안을 <b>스플래시·로그인 로고에 적용</b>하고, 필요하면 세부(색·크기·꼬리)도 다듬어 드릴게요.
+    이번 방향 중 끌리는 게 있으면 번호를, 없으면 <b>원하는 느낌(예: 더 심플 / 더 로맨틱 / 글자 기반)</b>을 알려주세요. 방향을 잡아 다시 그려드릴게요.
   </div>
 </div>
 </body>
