@@ -1289,7 +1289,7 @@ function renderProfile(){
                <input type="range" id="ageMaxR" min="19" max="65" value="${matchDraft.ageMax}" oninput="ageSlide('max')">
              </div></div>
            <div class="mr-field"><div class="mr-head">거리</div>
-             <div class="dist-chips">${[10,25,50,100,0].map(d=>`<span class="dchip ${matchDraft.distance===d?'sel':''}" onclick="matchDraft.distance=${d};renderProfile()">${d===0?'제한없음':d+'km'}</span>`).join('')}</div></div>`
+             <div class="dist-chips">${[10,25,50,100,250,500,0].map(d=>`<span class="dchip ${matchDraft.distance===d?'sel':''}" onclick="matchDraft.distance=${d};renderProfile()">${d===0?'제한없음':d+'km'}</span>`).join('')}</div></div>`
         : `<div class="info-row"><span>관심 성별</span><b>${m.match.gender}</b></div>
            <div class="info-row"><span>나이 범위</span><b>${m.match.ageMin} ~ ${m.match.ageMax}세</b></div>
            <div class="info-row"><span>거리</span><b>${m.match.distance===0?'제한 없음':m.match.distance+'km 이내'}</b></div>`}
